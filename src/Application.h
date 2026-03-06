@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <imgui.h>
 
 class Application
 {
@@ -30,12 +31,16 @@ private:
     void RenderGUI();
     void TerminateGUI();
 
+    void RecreateFontAtlas();
+
     void Shutdown();
     bool ShouldClose();
 
 private:
     SDL_Window* mWindow     = nullptr;
     SDL_Renderer* mRenderer = nullptr;
+
+    ImGuiContext* mGUIContext = nullptr;
 
     bool mIsRunning = true;
 };

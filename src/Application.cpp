@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
 #include <cassert>
@@ -158,17 +157,22 @@ void Application::OnKeyAction(SDL_Event& event)
 
 void Application::InitializeGUI()
 {
+    mGUIContext = ImGui::CreateContext();
+    ImGui::SetCurrentContext(mGUIContext);
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
+    ImGuiIO& io    = ImGui::GetIO();
+    io.IniFilename = "resources/gui/sample.ini";
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
+
+    RecreateFontAtlas();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForSDLRenderer(mWindow, mRenderer);
@@ -227,6 +231,25 @@ void Application::TerminateGUI()
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
+}
+
+void Application::RecreateFontAtlas()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    IM_DELETE(io.Fonts);
+
+    io.Fonts = IM_NEW(ImFontAtlas);
+
+    ImFontConfig config;
+    config.OversampleH = 4;
+    config.OversampleV = 4;
+    config.PixelSnapH  = false;
+
+    io.Fonts->AddFontFromFileTTF("resources/data/Play-Regular.ttf", 18.0f, &config);
+    io.Fonts->AddFontFromFileTTF("resources/data/Cuprum-Bold.ttf", 20.0f, &config);
+
+    io.Fonts->Build();
 }
 
 void Application::Shutdown()
