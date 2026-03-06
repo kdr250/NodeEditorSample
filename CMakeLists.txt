@@ -24,6 +24,7 @@ endif()
 
 find_package(SDL3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(unofficial-imgui-node-editor CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
@@ -51,6 +52,7 @@ if (EMSCRIPTEN)
         main PRIVATE
         SDL3::SDL3
         imgui::imgui
+        unofficial::imgui-node-editor::imgui-node-editor
     )
 
     set_target_properties(main PROPERTIES SUFFIX ".html")
@@ -63,6 +65,7 @@ else()
         main PRIVATE
         SDL3::SDL3
         imgui::imgui
+        unofficial::imgui-node-editor::imgui-node-editor
     )
 
     add_custom_command(

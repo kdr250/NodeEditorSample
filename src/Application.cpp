@@ -9,6 +9,8 @@
     #include <emscripten/html5.h>
 #endif
 
+namespace ed = ax::NodeEditor;
+
 Application::Application() {}
 
 bool Application::Initialize()
@@ -177,6 +179,11 @@ void Application::InitializeGUI()
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForSDLRenderer(mWindow, mRenderer);
     ImGui_ImplSDLRenderer3_Init(mRenderer);
+
+    // Editor
+    ed::Config config;
+    config.SettingsFile = "resources/gui/simple.json";
+    mEditorContext      = ed::CreateEditor(&config);
 }
 
 void Application::ProcessEventGUI(SDL_Event& event)
@@ -225,11 +232,27 @@ void Application::UpdateGUI()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, windowBorderSize);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, windowRounding);
 
+    // Node editor
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
     ImGui::Separator();
 
-    // TODO
+    ed::SetCurrentEditor(mEditorContext);
+    ed::Begin("My Editor", ImVec2(0.0, 0.0f));
+    int uniqueId = 1;
+    // Start drawing nodes.
+    ed::BeginNode(uniqueId++);
+    ImGui::Text("Node A");
+    ed::BeginPin(uniqueId++, ed::PinKind::Input);
+    ImGui::Text("-> In");
+    ed::EndPin();
+    ImGui::SameLine();
+    ed::BeginPin(uniqueId++, ed::PinKind::Output);
+    ImGui::Text("Out ->");
+    ed::EndPin();
+    ed::EndNode();
+    ed::End();
+    ed::SetCurrentEditor(nullptr);
 
     ImGui::PopStyleVar(2);
     ImGui::End();
@@ -244,6 +267,7 @@ void Application::RenderGUI()
 
 void Application::TerminateGUI()
 {
+    ed::DestroyEditor(mEditorContext);
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext(mGUIContext);

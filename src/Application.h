@@ -2,6 +2,9 @@
 
 #include <SDL3/SDL.h>
 #include <imgui.h>
+#include <imgui-node-editor/imgui_node_editor.h>
+
+namespace ed = ax::NodeEditor;
 
 class Application
 {
@@ -41,7 +44,8 @@ private:
     SDL_Window* mWindow     = nullptr;
     SDL_Renderer* mRenderer = nullptr;
 
-    ImGuiContext* mGUIContext = nullptr;
+    ImGuiContext* mGUIContext         = nullptr;
+    ed::EditorContext* mEditorContext = nullptr;
 
     bool mIsRunning = true;
 };
