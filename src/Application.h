@@ -25,6 +25,9 @@ private:
 
     // GUI
     void InitializeGUI();
+    void ProcessEventGUI(SDL_Event& event);
+    void UpdateGUI();
+    void RenderGUI();
     void TerminateGUI();
 
     void Shutdown();

@@ -1,5 +1,8 @@
 #include "Application.h"
 
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlrenderer3.h>
 #include <cassert>
 
 #ifdef __EMSCRIPTEN__
@@ -34,6 +37,7 @@ bool Application::Initialize()
         SDL_Quit();
         return false;
     }
+    SDL_SetRenderVSync(mRenderer, 1);
 
     InitializeGUI();
 
@@ -104,31 +108,21 @@ void Application::ProcessInput()
                 break;
         }
 
-        // ImGui_ImplSDL3_ProcessEvent(&event);
+        ProcessEventGUI(event);
     }
 }
 
 void Application::Update()
 {
-    // TODO
+    UpdateGUI();
 }
 
 void Application::GenerateOutput()
 {
-    // FIXME
     SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
     SDL_RenderClear(mRenderer);
 
-    SDL_SetRenderDrawColor(mRenderer, 0, 255, 0, 255);
-    SDL_RenderLine(mRenderer, 100, 100, 500, 500);
-
-    SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 255);
-    SDL_RenderPoint(mRenderer, 300, 50);
-
-    SDL_FRect rect {100.0f, 500.0f, 20.0f, 10.0f};
-    SDL_SetRenderDrawColor(mRenderer, 0, 0, 255, 255);
-    SDL_RenderRect(mRenderer, &rect);
-
+    RenderGUI();
     SDL_RenderPresent(mRenderer);
 }
 
@@ -164,12 +158,75 @@ void Application::OnKeyAction(SDL_Event& event)
 
 void Application::InitializeGUI()
 {
-    // TODO
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL3_InitForSDLRenderer(mWindow, mRenderer);
+    ImGui_ImplSDLRenderer3_Init(mRenderer);
+}
+
+void Application::ProcessEventGUI(SDL_Event& event)
+{
+    ImGui_ImplSDL3_ProcessEvent(&event);
+}
+
+void Application::UpdateGUI()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Start the Dear ImGui frame
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    // Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    {
+        static float f     = 0.0f;
+        static int counter = 0;
+
+        ImGui::Begin("Hello, world!");
+
+        ImGui::Text("This is some useful text.");
+
+        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+
+        if (ImGui::Button("Button"))
+        {
+            counter++;
+        }
+
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                    1000.0f / io.Framerate,
+                    io.Framerate);
+
+        ImGui::End();
+    }
+}
+
+void Application::RenderGUI()
+{
+    ImGui::Render();
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), mRenderer);
 }
 
 void Application::TerminateGUI()
 {
-    // TODO
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Application::Shutdown()
