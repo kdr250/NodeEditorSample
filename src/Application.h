@@ -1,0 +1,38 @@
+#pragma once
+
+#include <SDL3/SDL.h>
+
+class Application
+{
+public:
+    Application();
+
+    bool Initialize();
+    void RunLoop();
+
+private:
+    void Loop();
+
+    void ProcessInput();
+    void Update();
+    void GenerateOutput();
+
+    // Mouse events
+    void OnMouseMove();
+    void OnMouseButton(SDL_Event& event);
+    void OnScroll(SDL_Event& event);
+    void OnKeyAction(SDL_Event& event);
+
+    // GUI
+    void InitializeGUI();
+    void TerminateGUI();
+
+    void Shutdown();
+    bool ShouldClose();
+
+private:
+    SDL_Window* mWindow     = nullptr;
+    SDL_Renderer* mRenderer = nullptr;
+
+    bool mIsRunning = true;
+};
