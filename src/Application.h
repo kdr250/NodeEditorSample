@@ -32,6 +32,7 @@ private:
     void TerminateGUI();
 
     void RecreateFontAtlas();
+    ImGuiWindowFlags GetWindowFlags() const;
 
     void Shutdown();
     bool ShouldClose();

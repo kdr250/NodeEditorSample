@@ -188,36 +188,52 @@ void Application::UpdateGUI()
 {
     ImGuiIO& io = ImGui::GetIO();
 
+    // FIXME
+    const float windowScale      = 1.0f;
+    const float framebufferScale = 1.0f;
+
+    if (io.WantSetMousePos)
+    {
+        io.MousePos.x *= windowScale;
+        io.MousePos.y *= windowScale;
+    }
+
+    // Don't touch "uninitialized" mouse position
+    if (io.MousePos.x > -FLT_MAX && io.MousePos.y > -FLT_MAX)
+    {
+        io.MousePos.x /= windowScale;
+        io.MousePos.y /= windowScale;
+    }
+    io.DisplaySize.x /= windowScale;
+    io.DisplaySize.y /= windowScale;
+
+    io.DisplayFramebufferScale.x = framebufferScale;
+    io.DisplayFramebufferScale.y = framebufferScale;
+
     // Start the Dear ImGui frame
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    // Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-    {
-        static float f     = 0.0f;
-        static int counter = 0;
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(io.DisplaySize);
+    const auto windowBorderSize = ImGui::GetStyle().WindowBorderSize;
+    const auto windowRounding   = ImGui::GetStyle().WindowRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::Begin("Content", nullptr, GetWindowFlags());
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, windowBorderSize);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, windowRounding);
 
-        ImGui::Begin("Hello, world!");
+    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
-        ImGui::Text("This is some useful text.");
+    ImGui::Separator();
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+    // TODO
 
-        if (ImGui::Button("Button"))
-        {
-            counter++;
-        }
-
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                    1000.0f / io.Framerate,
-                    io.Framerate);
-
-        ImGui::End();
-    }
+    ImGui::PopStyleVar(2);
+    ImGui::End();
+    ImGui::PopStyleVar(2);
 }
 
 void Application::RenderGUI()
@@ -230,7 +246,7 @@ void Application::TerminateGUI()
 {
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
+    ImGui::DestroyContext(mGUIContext);
 }
 
 void Application::RecreateFontAtlas()
@@ -250,6 +266,13 @@ void Application::RecreateFontAtlas()
     io.Fonts->AddFontFromFileTTF("resources/data/Cuprum-Bold.ttf", 20.0f, &config);
 
     io.Fonts->Build();
+}
+
+ImGuiWindowFlags Application::GetWindowFlags() const
+{
+    return ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+           | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+           | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
 }
 
 void Application::Shutdown()
