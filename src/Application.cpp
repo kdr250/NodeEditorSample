@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "NodeEditor.h"
 
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
@@ -164,7 +165,7 @@ void Application::InitializeGUI()
     (void)io;
 
     ImNodes::CreateContext();
-    ImNodes::SetNodeGridSpacePos(1, ImVec2(200.0f, 200.0f));
+    example::NodeEditorInitialize();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForSDLRenderer(mWindow, mRenderer);
@@ -190,28 +191,7 @@ void Application::UpdateGUI()
     ImGui::NewFrame();
 
     // Editor
-    ImGui::Begin("simple node editor");
-
-    ImNodes::BeginNodeEditor();
-    ImNodes::BeginNode(1);
-
-    ImNodes::BeginNodeTitleBar();
-    ImGui::TextUnformatted("simple node :)");
-    ImNodes::EndNodeTitleBar();
-
-    ImNodes::BeginInputAttribute(2);
-    ImGui::Text("input");
-    ImNodes::EndInputAttribute();
-
-    ImNodes::BeginOutputAttribute(3);
-    ImGui::Indent(40);
-    ImGui::Text("output");
-    ImNodes::EndOutputAttribute();
-
-    ImNodes::EndNode();
-    ImNodes::EndNodeEditor();
-
-    ImGui::End();
+    example::NodeEditorShow();
 }
 
 void Application::RenderGUI()
@@ -224,6 +204,7 @@ void Application::TerminateGUI()
 {
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
+    example::NodeEditorShutdown();
     ImGui::DestroyContext();
 }
 
