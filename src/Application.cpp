@@ -169,28 +169,15 @@ void Application::InitializeGUI()
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForSDLRenderer(mWindow, mRenderer);
     ImGui_ImplSDLRenderer3_Init(mRenderer);
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    ImNodes::StyleColorsDark();
 }
 
 void Application::ProcessEventGUI(SDL_Event& event)
 {
     ImGui_ImplSDL3_ProcessEvent(&event);
-}
-
-void ImGuiEx_BeginColumn()
-{
-    ImGui::BeginGroup();
-}
-
-void ImGuiEx_NextColumn()
-{
-    ImGui::EndGroup();
-    ImGui::SameLine();
-    ImGui::BeginGroup();
-}
-
-void ImGuiEx_EndColumn()
-{
-    ImGui::EndGroup();
 }
 
 void Application::UpdateGUI()
@@ -202,11 +189,29 @@ void Application::UpdateGUI()
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
+    // Editor
+    ImGui::Begin("simple node editor");
 
-    ImGui::Separator();
+    ImNodes::BeginNodeEditor();
+    ImNodes::BeginNode(1);
 
-    // TODO
+    ImNodes::BeginNodeTitleBar();
+    ImGui::TextUnformatted("simple node :)");
+    ImNodes::EndNodeTitleBar();
+
+    ImNodes::BeginInputAttribute(2);
+    ImGui::Text("input");
+    ImNodes::EndInputAttribute();
+
+    ImNodes::BeginOutputAttribute(3);
+    ImGui::Indent(40);
+    ImGui::Text("output");
+    ImNodes::EndOutputAttribute();
+
+    ImNodes::EndNode();
+    ImNodes::EndNodeEditor();
+
+    ImGui::End();
 }
 
 void Application::RenderGUI()
