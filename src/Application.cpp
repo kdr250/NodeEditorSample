@@ -281,6 +281,20 @@ void Application::UpdateGUI()
         ed::BeginPin(nodeA_OutputPinId, ed::PinKind::Output);
         ImGui::Text("Out ->");
         ed::EndPin();
+
+        static char buffer[128] = "Edit Me\nMultiline!";
+        ImGui::Text("String");
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100.0f);
+        ImGui::InputText("##edit string", buffer, 127);
+        ImGui::PopItemWidth();
+
+        static float value = 0.0f;
+        ImGui::Text("Float");
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100.0f);
+        ImGui::InputFloat("##edit float", &value);
+        ImGui::PopItemWidth();
     }
     ed::EndNode();
 
