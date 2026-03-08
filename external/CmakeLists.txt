@@ -1,0 +1,14 @@
+add_library(
+    imnodes SHARED
+    imnodes/imnodes.h
+    imnodes/imnodes.cpp
+    imnodes/imnodes_internal.h
+)
+
+target_include_directories(
+    imnodes PUBLIC
+    imnodes/imnodes.h
+    imnodes/imnodes_internal.h
+)
+
+target_link_libraries(imnodes PUBLIC imgui::imgui)
