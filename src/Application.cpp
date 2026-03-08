@@ -2,6 +2,7 @@
 
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
+#include <imnodes.h>
 #include <cassert>
 
 #ifdef __EMSCRIPTEN__
@@ -162,7 +163,8 @@ void Application::InitializeGUI()
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
 
-    // TODO
+    ImNodes::CreateContext();
+    ImNodes::SetNodeGridSpacePos(1, ImVec2(200.0f, 200.0f));
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL3_InitForSDLRenderer(mWindow, mRenderer);
