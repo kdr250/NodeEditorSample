@@ -2,16 +2,17 @@
 
 #include <imnodes.h>
 #include <imgui.h>
+#include <sstream>
 #include "Graph.h"
 
 enum class NodeType
 {
     add,
     multiply,
-    output,
     sine,
     time,
-    value
+    value,
+    print,
 };
 
 struct Node
@@ -36,17 +37,17 @@ private:
     NodeEditor(const NodeEditor&)            = delete;
     NodeEditor& operator=(const NodeEditor&) = delete;
 
-    ImU32 evaluate(const example::Graph<Node>& graph, const int root_node);
+    std::stringstream evaluate(const example::Graph<Node>& graph, const int root_node);
 
-    void executeLua();
+    void executeLua(std::stringstream& luaSource);
 
     enum class UiNodeType
     {
         add,
         multiply,
-        output,
         sine,
         time,
+        print,
     };
 
     struct UiNode
@@ -71,13 +72,13 @@ private:
 
             struct
             {
-                int r, g, b;
-            } output;
+                int input;
+            } sine;
 
             struct
             {
                 int input;
-            } sine;
+            } print;
         } ui;
     };
 

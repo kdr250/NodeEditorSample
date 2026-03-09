@@ -168,27 +168,6 @@ void NodeEditor::show()
                 ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
             }
 
-            if (ImGui::MenuItem("output") && root_node_id_ == -1)
-            {
-                const Node value(NodeType::value, 0.f);
-                const Node out(NodeType::output);
-
-                UiNode ui_node;
-                ui_node.type        = UiNodeType::output;
-                ui_node.ui.output.r = graph_.insert_node(value);
-                ui_node.ui.output.g = graph_.insert_node(value);
-                ui_node.ui.output.b = graph_.insert_node(value);
-                ui_node.id          = graph_.insert_node(out);
-
-                graph_.insert_edge(ui_node.id, ui_node.ui.output.r);
-                graph_.insert_edge(ui_node.id, ui_node.ui.output.g);
-                graph_.insert_edge(ui_node.id, ui_node.ui.output.b);
-
-                nodes_.push_back(ui_node);
-                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
-                root_node_id_ = ui_node.id;
-            }
-
             if (ImGui::MenuItem("sine"))
             {
                 const Node value(NodeType::value, 0.f);
@@ -213,6 +192,23 @@ void NodeEditor::show()
 
                 nodes_.push_back(ui_node);
                 ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
+            }
+
+            if (ImGui::MenuItem("print") && root_node_id_ == -1)
+            {
+                const Node value(NodeType::value, 0.f);
+                const Node print(NodeType::print);
+
+                UiNode ui_node;
+                ui_node.type           = UiNodeType::print;
+                ui_node.ui.print.input = graph_.insert_node(value);
+                ui_node.id             = graph_.insert_node(print);
+
+                graph_.insert_edge(ui_node.id, ui_node.ui.sine.input);
+
+                nodes_.push_back(ui_node);
+                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
+                root_node_id_ = ui_node.id;
             }
 
             ImGui::EndPopup();
@@ -327,82 +323,7 @@ void NodeEditor::show()
                 ImNodes::EndNode();
             }
             break;
-            case UiNodeType::output:
-            {
-                const float node_width = 100.0f;
-                ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(11, 109, 191, 255));
-                ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(45, 126, 194, 255));
-                ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(81, 148, 204, 255));
-                ImNodes::BeginNode(node.id);
 
-                ImNodes::BeginNodeTitleBar();
-                ImGui::TextUnformatted("output");
-                ImNodes::EndNodeTitleBar();
-
-                ImGui::Dummy(ImVec2(node_width, 0.f));
-                {
-                    ImNodes::BeginInputAttribute(node.ui.output.r);
-                    const float label_width = ImGui::CalcTextSize("r").x;
-                    ImGui::TextUnformatted("r");
-                    if (graph_.num_edges_from_node(node.ui.output.r) == 0ull)
-                    {
-                        ImGui::SameLine();
-                        ImGui::PushItemWidth(node_width - label_width);
-                        ImGui::DragFloat("##hidelabel",
-                                         &graph_.node(node.ui.output.r).value,
-                                         0.01f,
-                                         0.f,
-                                         1.0f);
-                        ImGui::PopItemWidth();
-                    }
-                    ImNodes::EndInputAttribute();
-                }
-
-                ImGui::Spacing();
-
-                {
-                    ImNodes::BeginInputAttribute(node.ui.output.g);
-                    const float label_width = ImGui::CalcTextSize("g").x;
-                    ImGui::TextUnformatted("g");
-                    if (graph_.num_edges_from_node(node.ui.output.g) == 0ull)
-                    {
-                        ImGui::SameLine();
-                        ImGui::PushItemWidth(node_width - label_width);
-                        ImGui::DragFloat("##hidelabel",
-                                         &graph_.node(node.ui.output.g).value,
-                                         0.01f,
-                                         0.f,
-                                         1.f);
-                        ImGui::PopItemWidth();
-                    }
-                    ImNodes::EndInputAttribute();
-                }
-
-                ImGui::Spacing();
-
-                {
-                    ImNodes::BeginInputAttribute(node.ui.output.b);
-                    const float label_width = ImGui::CalcTextSize("b").x;
-                    ImGui::TextUnformatted("b");
-                    if (graph_.num_edges_from_node(node.ui.output.b) == 0ull)
-                    {
-                        ImGui::SameLine();
-                        ImGui::PushItemWidth(node_width - label_width);
-                        ImGui::DragFloat("##hidelabel",
-                                         &graph_.node(node.ui.output.b).value,
-                                         0.01f,
-                                         0.f,
-                                         1.0f);
-                        ImGui::PopItemWidth();
-                    }
-                    ImNodes::EndInputAttribute();
-                }
-                ImNodes::EndNode();
-                ImNodes::PopColorStyle();
-                ImNodes::PopColorStyle();
-                ImNodes::PopColorStyle();
-            }
-            break;
             case UiNodeType::sine:
             {
                 const float node_width = 100.0f;
@@ -456,6 +377,44 @@ void NodeEditor::show()
                 ImNodes::EndOutputAttribute();
 
                 ImNodes::EndNode();
+            }
+            break;
+
+            case UiNodeType::print:
+            {
+                const float node_width = 100.0f;
+                ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(11, 109, 191, 255));
+                ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(45, 126, 194, 255));
+                ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(81, 148, 204, 255));
+                ImNodes::BeginNode(node.id);
+
+                ImNodes::BeginNodeTitleBar();
+                ImGui::TextUnformatted("print");
+                ImNodes::EndNodeTitleBar();
+
+                ImGui::Dummy(ImVec2(node_width, 0.f));
+                {
+                    ImNodes::BeginInputAttribute(node.ui.print.input);
+                    const float label_width = ImGui::CalcTextSize("input").x;
+                    ImGui::TextUnformatted("input");
+                    if (graph_.num_edges_from_node(node.ui.print.input) == 0ull)
+                    {
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(node_width - label_width);
+                        ImGui::DragFloat("##hidelabel",
+                                         &graph_.node(node.ui.print.input).value,
+                                         0.01f,
+                                         0.f,
+                                         1.0f);
+                        ImGui::PopItemWidth();
+                    }
+                    ImNodes::EndInputAttribute();
+                }
+
+                ImNodes::EndNode();
+                ImNodes::PopColorStyle();
+                ImNodes::PopColorStyle();
+                ImNodes::PopColorStyle();
             }
             break;
         }
@@ -550,14 +509,11 @@ void NodeEditor::show()
                         graph_.erase_node(iter->ui.multiply.lhs);
                         graph_.erase_node(iter->ui.multiply.rhs);
                         break;
-                    case UiNodeType::output:
-                        graph_.erase_node(iter->ui.output.r);
-                        graph_.erase_node(iter->ui.output.g);
-                        graph_.erase_node(iter->ui.output.b);
-                        root_node_id_ = -1;
-                        break;
                     case UiNodeType::sine:
                         graph_.erase_node(iter->ui.sine.input);
+                        break;
+                    case UiNodeType::print:
+                        graph_.erase_node(iter->ui.print.input);
                         break;
                     default:
                         break;
@@ -572,8 +528,8 @@ void NodeEditor::show()
     // The color output window
     if (isEvaluatePressed && root_node_id_ != -1)
     {
-        mResult = evaluate(graph_, root_node_id_);
-        executeLua();
+        auto luaSource = evaluate(graph_, root_node_id_);
+        executeLua(luaSource);
     }
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, mResult);
@@ -582,9 +538,11 @@ void NodeEditor::show()
     ImGui::PopStyleColor();
 }
 
-ImU32 NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_node)
+std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_node)
 {
     std::cout << "###### Start evaluate ####" << std::endl;
+    std::stringstream result;
+
     std::stack<int> postorder;
     dfs_traverse(graph,
                  root_node,
@@ -659,32 +617,31 @@ ImU32 NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_nod
                 }
             }
             break;
+            case NodeType::print:
+            {
+                std::cout << "====NodeType::print====" << std::endl;
+                const float input = value_stack.top();
+                value_stack.pop();
+                result << "print(" << std::to_string(input) << ");" << std::endl;
+                std::cout << "code = " << result.str();
+            }
+            break;
             default:
                 break;
         }
     }
 
-    // The final output node isn't evaluated in the loop -- instead we just pop
-    // the three values which should be in the stack.
-    assert(value_stack.size() == 3ull);
-    const int b = static_cast<int>(255.f * std::clamp(value_stack.top(), 0.f, 1.f) + 0.5f);
-    value_stack.pop();
-    const int g = static_cast<int>(255.f * std::clamp(value_stack.top(), 0.f, 1.f) + 0.5f);
-    value_stack.pop();
-    const int r = static_cast<int>(255.f * std::clamp(value_stack.top(), 0.f, 1.f) + 0.5f);
-    value_stack.pop();
-
     std::cout << "###### End evaluate ####" << std::endl;
 
-    return IM_COL32(r, g, b, 255);
+    return result;
 }
 
-void NodeEditor::executeLua()
+void NodeEditor::executeLua(std::stringstream& luaSource)
 {
     lua_State* pL = luaL_newstate();
     luaL_openlibs(pL);
 
-    if (luaL_dostring(pL, LUA_SCRIPT_SOURCE) != LUA_OK)
+    if (luaL_dostring(pL, luaSource.str().c_str()) != LUA_OK)
     {
         std::cerr << lua_tostring(pL, lua_gettop(pL)) << std::endl;
         lua_close(pL);
