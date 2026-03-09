@@ -1,8 +1,8 @@
 #include "NodeEditor.h"
 
 #include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_log.h>
 #include <lua.hpp>
-#include <iostream>
 #include <algorithm>
 #include <cassert>
 #include <chrono>
@@ -528,7 +528,6 @@ void NodeEditor::show()
 
 std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_node)
 {
-    std::cout << "###### Start evaluate ####" << std::endl;
     std::stringstream result;
 
     std::stack<int> postorder;
@@ -539,7 +538,6 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
                      postorder.push(node_id);
                  });
 
-    std::stack<float> value_stack;
     std::stack<std::string> code_stack;
     unsigned int variable_id = 0;
     while (!postorder.empty())
@@ -552,68 +550,40 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
         {
             case NodeType::add:
             {
-                std::cout << "====NodeType::add====" << std::endl;
-                const float rhs    = value_stack.top();
-                std::string rhsStr = code_stack.top();
-                std::cout << "rhs = " << rhs << std::endl;
-                value_stack.pop();
+                std::string rhs = code_stack.top();
                 code_stack.pop();
-                const float lhs    = value_stack.top();
-                std::string lhsStr = code_stack.top();
-                std::cout << "lhs = " << lhs << std::endl;
-                value_stack.pop();
+                std::string lhs = code_stack.top();
                 code_stack.pop();
-                value_stack.push(lhs + rhs);
                 std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << lhsStr << " + " << rhsStr << ";" << std::endl;
+                result << varId << " = " << lhs << " + " << rhs << ";" << std::endl;
                 code_stack.push(varId);
-                std::cout << "pushed result = " << (lhs + rhs) << std::endl;
             }
             break;
             case NodeType::multiply:
             {
-                std::cout << "====NodeType::multiply====" << std::endl;
-                const float rhs    = value_stack.top();
-                std::string rhsStr = code_stack.top();
-                std::cout << "rhs = " << rhs << std::endl;
-                value_stack.pop();
+                std::string rhs = code_stack.top();
                 code_stack.pop();
-                const float lhs    = value_stack.top();
-                std::string lhsStr = code_stack.top();
-                std::cout << "lhs = " << lhs << std::endl;
-                value_stack.pop();
+                std::string lhs = code_stack.top();
                 code_stack.pop();
-                value_stack.push(rhs * lhs);
                 std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << lhsStr << " * " << rhsStr << ";" << std::endl;
+                result << varId << " = " << lhs << " * " << rhs << ";" << std::endl;
                 code_stack.push(varId);
-                std::cout << "pushed result = " << (lhs + rhs) << std::endl;
             }
             break;
             case NodeType::sine:
             {
-                std::cout << "====NodeType::sine====" << std::endl;
-                const float x    = value_stack.top();
-                std::string xStr = code_stack.top();
-                std::cout << "x = " << x << std::endl;
-                value_stack.pop();
+                std::string x = code_stack.top();
                 code_stack.pop();
-                const float res = std::abs(std::sin(x));
-                value_stack.push(res);
                 std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << "math.sin(" << xStr << ");" << std::endl;
+                result << varId << " = " << "math.sin(" << x << ");" << std::endl;
                 code_stack.push(varId);
-                std::cout << "pushed result = " << res << std::endl;
             }
             break;
             case NodeType::time:
             {
-                std::cout << "====NodeType::time====" << std::endl;
-                value_stack.push(current_time_seconds);
                 std::string varId = "var" + std::to_string(variable_id++);
                 result << varId << " = " << "os.clock();" << std::endl;
                 code_stack.push(varId);
-                std::cout << "pushed result = " << current_time_seconds << std::endl;
             }
             break;
             case NodeType::value:
@@ -621,31 +591,23 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
                 // If the edge does not have an edge connecting to another node, then just use the value
                 // at this node. It means the node's input pin has not been connected to anything and
                 // the value comes from the node's UI.
-                std::cout << "====NodeType::value====" << std::endl;
                 if (graph.num_edges_from_node(id) == 0ull)
                 {
-                    value_stack.push(node.value);
                     code_stack.push(std::to_string(node.value));
-                    std::cout << "pushed result node value = " << node.value << std::endl;
                 }
             }
             break;
             case NodeType::print:
             {
-                std::cout << "====NodeType::print====" << std::endl;
                 std::string input = code_stack.top();
                 code_stack.pop();
                 result << "print(" << input << ");" << std::endl;
-                std::cout << "↓↓↓↓ Lua ↓↓↓" << std::endl
-                          << result.str() << "↑↑↑↑ Lua ↑↑↑" << std::endl;
             }
             break;
             default:
                 break;
         }
     }
-
-    std::cout << "###### End evaluate ####" << std::endl;
 
     return result;
 }
@@ -657,7 +619,7 @@ void NodeEditor::executeLua(std::stringstream& luaSource)
 
     if (luaL_dostring(pL, luaSource.str().c_str()) != LUA_OK)
     {
-        std::cerr << lua_tostring(pL, lua_gettop(pL)) << std::endl;
+        SDL_Log("Failed to execute Lua: %s", lua_tostring(pL, lua_gettop(pL)));
         lua_close(pL);
         return;
     }
