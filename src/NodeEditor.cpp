@@ -8,8 +8,7 @@
 #include <cmath>
 #include <vector>
 
-static float current_time_seconds      = 0.f;
-static bool emulate_three_button_mouse = false;
+static float current_time_seconds = 0.f;
 
 namespace example
 {
@@ -104,11 +103,7 @@ void NodeEditor::show()
     ImGui::TextUnformatted("A -- add node");
     ImGui::TextUnformatted("X -- delete selected node or link");
     ImGui::NextColumn();
-    if (ImGui::Checkbox("emulate_three_button_mouse", &emulate_three_button_mouse))
-    {
-        ImNodes::GetIO().EmulateThreeButtonMouse.Modifier =
-            emulate_three_button_mouse ? &ImGui::GetIO().KeyAlt : NULL;
-    }
+    bool isEvaluatePressed = ImGui::Button("evaluate", ImVec2(80, 20));
     ImGui::Columns(1);
 
     ImNodes::BeginNodeEditor();
@@ -567,10 +562,12 @@ void NodeEditor::show()
     ImGui::End();
 
     // The color output window
+    if (isEvaluatePressed && root_node_id_ != -1)
+    {
+        mResult = evaluate(graph_, root_node_id_);
+    }
 
-    const ImU32 color =
-        root_node_id_ != -1 ? evaluate(graph_, root_node_id_) : IM_COL32(255, 20, 147, 255);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, color);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, mResult);
     ImGui::Begin("output color");
     ImGui::End();
     ImGui::PopStyleColor();

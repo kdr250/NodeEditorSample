@@ -83,6 +83,8 @@ private:
     std::vector<UiNode> nodes_;
     int root_node_id_;
     ImNodesMiniMapLocation minimap_location_;
+
+    ImU32 mResult = IM_COL32(255, 20, 147, 255);
 };
 
 namespace example
