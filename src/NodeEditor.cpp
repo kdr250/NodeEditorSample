@@ -1,6 +1,7 @@
 #include "NodeEditor.h"
 
 #include <SDL3/SDL_timer.h>
+#include <lua.hpp>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -9,6 +10,13 @@
 #include <vector>
 
 static float current_time_seconds = 0.f;
+
+const char* LUA_SCRIPT_SOURCE = R"(
+test1 = 100;
+test2 = 200;
+test3 = test1 + test2;
+print("From Lua Script: test3 = " .. test3);
+)";
 
 namespace example
 {
@@ -565,6 +573,7 @@ void NodeEditor::show()
     if (isEvaluatePressed && root_node_id_ != -1)
     {
         mResult = evaluate(graph_, root_node_id_);
+        executeLua();
     }
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, mResult);
@@ -668,4 +677,19 @@ ImU32 NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_nod
     std::cout << "###### End evaluate ####" << std::endl;
 
     return IM_COL32(r, g, b, 255);
+}
+
+void NodeEditor::executeLua()
+{
+    lua_State* pL = luaL_newstate();
+    luaL_openlibs(pL);
+
+    if (luaL_dostring(pL, LUA_SCRIPT_SOURCE) != LUA_OK)
+    {
+        std::cerr << lua_tostring(pL, lua_gettop(pL)) << std::endl;
+        lua_close(pL);
+        return;
+    }
+
+    lua_close(pL);
 }

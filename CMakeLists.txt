@@ -24,6 +24,7 @@ endif()
 
 find_package(SDL3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(Lua REQUIRED)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
@@ -54,6 +55,12 @@ if (EMSCRIPTEN)
         SDL3::SDL3
         imgui::imgui
         imnodes
+        ${LUA_LIBRARIES}
+    )
+
+    target_include_directories(
+        main PRIVATE
+        ${LUA_INCLUDE_DIR}
     )
 
     set_target_properties(main PROPERTIES SUFFIX ".html")
@@ -67,6 +74,12 @@ else()
         SDL3::SDL3
         imgui::imgui
         imnodes
+        ${LUA_LIBRARIES}
+    )
+
+    target_include_directories(
+        main PRIVATE
+        ${LUA_INCLUDE_DIR}
     )
 
     add_custom_command(

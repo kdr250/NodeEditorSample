@@ -38,6 +38,8 @@ private:
 
     ImU32 evaluate(const example::Graph<Node>& graph, const int root_node);
 
+    void executeLua();
+
     enum class UiNodeType
     {
         add,
