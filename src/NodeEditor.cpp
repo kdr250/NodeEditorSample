@@ -540,6 +540,8 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
                  });
 
     std::stack<float> value_stack;
+    std::stack<std::string> code_stack;
+    unsigned int variable_id = 0;
     while (!postorder.empty())
     {
         const int id = postorder.top();
@@ -551,37 +553,56 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
             case NodeType::add:
             {
                 std::cout << "====NodeType::add====" << std::endl;
-                const float rhs = value_stack.top();
+                const float rhs    = value_stack.top();
+                std::string rhsStr = code_stack.top();
                 std::cout << "rhs = " << rhs << std::endl;
                 value_stack.pop();
-                const float lhs = value_stack.top();
+                code_stack.pop();
+                const float lhs    = value_stack.top();
+                std::string lhsStr = code_stack.top();
                 std::cout << "lhs = " << lhs << std::endl;
                 value_stack.pop();
+                code_stack.pop();
                 value_stack.push(lhs + rhs);
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << lhsStr << " + " << rhsStr << ";" << std::endl;
+                code_stack.push(varId);
                 std::cout << "pushed result = " << (lhs + rhs) << std::endl;
             }
             break;
             case NodeType::multiply:
             {
                 std::cout << "====NodeType::multiply====" << std::endl;
-                const float rhs = value_stack.top();
+                const float rhs    = value_stack.top();
+                std::string rhsStr = code_stack.top();
                 std::cout << "rhs = " << rhs << std::endl;
                 value_stack.pop();
-                const float lhs = value_stack.top();
+                code_stack.pop();
+                const float lhs    = value_stack.top();
+                std::string lhsStr = code_stack.top();
                 std::cout << "lhs = " << lhs << std::endl;
                 value_stack.pop();
+                code_stack.pop();
                 value_stack.push(rhs * lhs);
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << lhsStr << " * " << rhsStr << ";" << std::endl;
+                code_stack.push(varId);
                 std::cout << "pushed result = " << (lhs + rhs) << std::endl;
             }
             break;
             case NodeType::sine:
             {
                 std::cout << "====NodeType::sine====" << std::endl;
-                const float x = value_stack.top();
+                const float x    = value_stack.top();
+                std::string xStr = code_stack.top();
                 std::cout << "x = " << x << std::endl;
                 value_stack.pop();
+                code_stack.pop();
                 const float res = std::abs(std::sin(x));
                 value_stack.push(res);
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << "math.sin(" << xStr << ");" << std::endl;
+                code_stack.push(varId);
                 std::cout << "pushed result = " << res << std::endl;
             }
             break;
@@ -589,6 +610,9 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
             {
                 std::cout << "====NodeType::time====" << std::endl;
                 value_stack.push(current_time_seconds);
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << "os.clock();" << std::endl;
+                code_stack.push(varId);
                 std::cout << "pushed result = " << current_time_seconds << std::endl;
             }
             break;
@@ -601,6 +625,7 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
                 if (graph.num_edges_from_node(id) == 0ull)
                 {
                     value_stack.push(node.value);
+                    code_stack.push(std::to_string(node.value));
                     std::cout << "pushed result node value = " << node.value << std::endl;
                 }
             }
@@ -608,10 +633,11 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
             case NodeType::print:
             {
                 std::cout << "====NodeType::print====" << std::endl;
-                const float input = value_stack.top();
-                value_stack.pop();
-                result << "print(" << std::to_string(input) << ");" << std::endl;
-                std::cout << "code = " << result.str();
+                std::string input = code_stack.top();
+                code_stack.pop();
+                result << "print(" << input << ");" << std::endl;
+                std::cout << "↓↓↓↓ Lua ↓↓↓" << std::endl
+                          << result.str() << "↑↑↑↑ Lua ↑↑↑" << std::endl;
             }
             break;
             default:
