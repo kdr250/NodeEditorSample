@@ -11,13 +11,6 @@
 
 static float current_time_seconds = 0.f;
 
-const char* LUA_SCRIPT_SOURCE = R"(
-test1 = 100;
-test2 = 200;
-test3 = test1 + test2;
-print("From Lua Script: test3 = " .. test3);
-)";
-
 namespace example
 {
     void NodeEditorInitialize()
@@ -525,17 +518,12 @@ void NodeEditor::show()
 
     ImGui::End();
 
-    // The color output window
+    // into Lua
     if (isEvaluatePressed && root_node_id_ != -1)
     {
         auto luaSource = evaluate(graph_, root_node_id_);
         executeLua(luaSource);
     }
-
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, mResult);
-    ImGui::Begin("output color");
-    ImGui::End();
-    ImGui::PopStyleColor();
 }
 
 std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_node)
