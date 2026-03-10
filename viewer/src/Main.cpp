@@ -6,7 +6,12 @@ int main()
     lua_State* pL = luaL_newstate();
     luaL_openlibs(pL);
 
-    if (luaL_dofile(pL, "resources/sample.lua") != LUA_OK)  // FIXME
+#ifdef __EMSCRIPTEN__
+    const char* path = "resources/sample.lua";  // FIXME
+#else
+    const char* path = "resources/output.lua";
+#endif
+    if (luaL_dofile(pL, path) != LUA_OK)
     {
         std::cout << "Failed to execute Lua: " << lua_tostring(pL, lua_gettop(pL)) << std::endl;
         lua_close(pL);

@@ -6,7 +6,6 @@ endif()
 
 find_package(SDL3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-find_package(Lua REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
@@ -28,12 +27,6 @@ if (EMSCRIPTEN)
         SDL3::SDL3
         imgui::imgui
         imnodes
-        ${LUA_LIBRARIES}
-    )
-
-    target_include_directories(
-        editor PRIVATE
-        ${LUA_INCLUDE_DIR}
     )
 
     set_target_properties(editor PROPERTIES SUFFIX ".html")
@@ -47,12 +40,6 @@ else()
         SDL3::SDL3
         imgui::imgui
         imnodes
-        ${LUA_LIBRARIES}
-    )
-
-    target_include_directories(
-        editor PRIVATE
-        ${LUA_INCLUDE_DIR}
     )
 
     # copy resources

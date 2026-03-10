@@ -2,12 +2,12 @@
 
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_log.h>
-#include <lua.hpp>
 #include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cmath>
 #include <vector>
+#include <fstream>
 
 static float current_time_seconds = 0.f;
 
@@ -522,7 +522,7 @@ void NodeEditor::show()
     if (isEvaluatePressed && root_node_id_ != -1)
     {
         auto luaSource = evaluate(graph_, root_node_id_);
-        executeLua(luaSource);
+        saveFile(luaSource);
     }
 }
 
@@ -612,17 +612,8 @@ std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const 
     return result;
 }
 
-void NodeEditor::executeLua(std::stringstream& luaSource)
+void NodeEditor::saveFile(std::stringstream& luaSource)
 {
-    lua_State* pL = luaL_newstate();
-    luaL_openlibs(pL);
-
-    if (luaL_dostring(pL, luaSource.str().c_str()) != LUA_OK)
-    {
-        SDL_Log("Failed to execute Lua: %s", lua_tostring(pL, lua_gettop(pL)));
-        lua_close(pL);
-        return;
-    }
-
-    lua_close(pL);
+    std::ofstream file("resources/output.lua");
+    file << luaSource.str();
 }

@@ -39,7 +39,7 @@ private:
 
     std::stringstream evaluate(const example::Graph<Node>& graph, const int root_node);
 
-    void executeLua(std::stringstream& luaSource);
+    void saveFile(std::stringstream& luaSource);
 
     enum class UiNodeType
     {
