@@ -9,35 +9,32 @@
     #include <emscripten/html5.h>
 #endif
 
-int main(int argc, char* argv[])
+int main()
 {
 #ifdef __EMSCRIPTEN__
-    // EM_ASM(FS.mount(IDBFS, {autoPersist : true}, "/resources"););
     // clang-format off
         EM_ASM(
+            FS.mkdir('/resources');
             FS.mount(IDBFS, {}, '/resources');
-            FS.syncfs(function (err) {
+            FS.syncfs(true, function (err) {
               assert(!err);
             });
         );
+
+        emscripten_sleep(500);
     // clang-format on
 #endif
 
     lua_State* pL = luaL_newstate();
     luaL_openlibs(pL);
 
-    auto file = fopen("/resources/output.lua", "r");
-    if (!file)
-    {
-        std::cout << "file does not exist" << std::endl;
-        return EXIT_FAILURE;
-    }
-    char str[256] = {};
-    fread(&str[0], sizeof(*str), sizeof(str) / sizeof(*str), file);
+#ifdef __EMSCRIPTEN__
+    const char* path = "/resources/output.lua";
+#else
+    const char* path = "resources/output.lua";
+#endif
 
-    fclose(file);
-
-    if (luaL_dostring(pL, str) != LUA_OK)
+    if (luaL_dofile(pL, path) != LUA_OK)
     {
         std::cout << "Failed to execute Lua: " << lua_tostring(pL, lua_gettop(pL)) << std::endl;
         lua_close(pL);

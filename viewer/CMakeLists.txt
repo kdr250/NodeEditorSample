@@ -17,6 +17,7 @@ if (EMSCRIPTEN)
 
     target_link_options(
         viewer PRIVATE
+        -sASYNCIFY
         -lidbfs.js
         -sFORCE_FILESYSTEM
         --profiling-funcs
