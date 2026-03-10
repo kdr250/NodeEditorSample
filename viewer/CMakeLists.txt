@@ -17,8 +17,10 @@ if (EMSCRIPTEN)
 
     target_link_options(
         viewer PRIVATE
+        -lidbfs.js
+        -sFORCE_FILESYSTEM
+        --profiling-funcs
         -sALLOW_MEMORY_GROWTH
-        --preload-file resources/
     )
 
     target_link_libraries(

@@ -9,12 +9,29 @@
 #include <vector>
 #include <fstream>
 
+#ifdef __EMSCRIPTEN__
+    #include <emscripten.h>
+    #include <emscripten/html5.h>
+#endif
+
 static float current_time_seconds = 0.f;
 
 namespace example
 {
     void NodeEditorInitialize()
     {
+#ifdef __EMSCRIPTEN__
+        // clang-format off
+        EM_ASM(
+            FS.mkdir('/resources');
+            FS.mount(IDBFS, {}, '/resources');
+            FS.syncfs(true, function (err) {
+              assert(!err);
+            });
+        );
+        // clang-format on
+#endif
+
         ImNodesIO& io                           = ImNodes::GetIO();
         io.LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
         NodeEditor::Instance();
@@ -616,4 +633,14 @@ void NodeEditor::saveFile(std::stringstream& luaSource)
 {
     std::ofstream file("resources/output.lua");
     file << luaSource.str();
+
+#ifdef __EMSCRIPTEN__
+    // clang-format off
+        EM_ASM(
+            FS.syncfs(false, function (err) {
+                assert(!err);
+            });
+        );
+    // clang-format on
+#endif
 }

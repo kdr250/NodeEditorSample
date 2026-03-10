@@ -18,8 +18,9 @@ if (EMSCRIPTEN)
 
     target_link_options(
         editor PRIVATE
+        -lidbfs.js
+        -sFORCE_FILESYSTEM
         -sALLOW_MEMORY_GROWTH
-        --preload-file resources/
     )
 
     target_link_libraries(
@@ -30,8 +31,6 @@ if (EMSCRIPTEN)
     )
 
     set_target_properties(editor PROPERTIES SUFFIX ".html")
-
-    file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})
 
 else()
 
