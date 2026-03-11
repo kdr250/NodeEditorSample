@@ -7,32 +7,43 @@
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
     #include <emscripten/html5.h>
+
+extern "C"
+{
+    static bool isSyncFinished = false;
+
+    void EMSCRIPTEN_KEEPALIVE onSyncFinished()
+    {
+        isSyncFinished = true;
+    }
+}
 #endif
 
 int main()
 {
 #ifdef __EMSCRIPTEN__
-    // clang-format off
-        EM_ASM(
-            FS.mkdir('/resources');
-            FS.mount(IDBFS, {}, '/resources');
-            FS.syncfs(true, function (err) {
-              assert(!err);
-            });
-        );
+    isSyncFinished = false;
 
-        emscripten_sleep(500);
+    // clang-format off
+    EM_ASM(
+        FS.mkdir('/resources');
+        FS.mount(IDBFS, {}, '/resources');
+        FS.syncfs(true, function (err) {
+            ccall('onSyncFinished', null, [], []);
+        });
+    );
     // clang-format on
+
+    while (!isSyncFinished)
+    {
+        emscripten_sleep(1);
+    }
 #endif
 
     lua_State* pL = luaL_newstate();
     luaL_openlibs(pL);
 
-#ifdef __EMSCRIPTEN__
-    const char* path = "/resources/output.lua";
-#else
     const char* path = "resources/output.lua";
-#endif
 
     if (luaL_dofile(pL, path) != LUA_OK)
     {

@@ -18,6 +18,7 @@ if (EMSCRIPTEN)
     target_link_options(
         viewer PRIVATE
         -sASYNCIFY
+        -sEXPORTED_RUNTIME_METHODS=['ccall']
         -lidbfs.js
         -sFORCE_FILESYSTEM
         --profiling-funcs
