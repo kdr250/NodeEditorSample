@@ -43,20 +43,12 @@ int main()
 
     const char* path = "resources/output.lua";
 
-    const char* script = R"(
-        var0 = 1 + 2;
-        print(var0);
-        var1 = UltimateFunction(var0);
-        var2 = UltimateFunction2(var1);
-        print(var2);
-    )";
-
     for (auto& [name, func] : CppFunctions::GetFunctions())
     {
         lua_register(pL, name.c_str(), func);
     }
 
-    if (luaL_dostring(pL, script) != LUA_OK)
+    if (luaL_dofile(pL, path) != LUA_OK)
     {
         std::cout << "Failed to execute Lua: " << lua_tostring(pL, lua_gettop(pL)) << std::endl;
         lua_close(pL);

@@ -13,6 +13,8 @@ enum class NodeType
     time,
     value,
     print,
+    ultimate,
+    ultimate2,
 };
 
 struct Node
@@ -47,6 +49,8 @@ private:
         sine,
         time,
         print,
+        ultimate,
+        ultimate2,
     };
 
     struct UiNode
@@ -78,6 +82,16 @@ private:
             {
                 int input;
             } print;
+
+            struct
+            {
+                int input;
+            } ultimate;
+
+            struct
+            {
+                int input;
+            } ultimate2;
         } ui;
     };
 

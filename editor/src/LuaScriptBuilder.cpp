@@ -73,6 +73,27 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
                 }
             }
             break;
+
+            case NodeType::ultimate:
+            {
+                std::string x = code_stack.top();
+                code_stack.pop();
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << "UltimateFunction(" << x << ");" << std::endl;
+                code_stack.push(varId);
+            }
+            break;
+
+            case NodeType::ultimate2:
+            {
+                std::string x = code_stack.top();
+                code_stack.pop();
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << "UltimateFunction2(" << x << ");" << std::endl;
+                code_stack.push(varId);
+            }
+            break;
+
             case NodeType::print:
             {
                 std::string input = code_stack.top();
