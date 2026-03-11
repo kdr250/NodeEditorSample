@@ -13,6 +13,11 @@ add_executable(
     ${SOURCES}
 )
 
+target_link_libraries(
+    viewer PRIVATE
+    core
+)
+
 if (EMSCRIPTEN)
 
     target_link_options(

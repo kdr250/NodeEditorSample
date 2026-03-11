@@ -35,5 +35,6 @@ project(top)
 
 # project subdirectories
 add_subdirectory(external/imnodes imnodes)
+add_subdirectory(core)
 add_subdirectory(editor)
 add_subdirectory(viewer)

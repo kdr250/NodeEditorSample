@@ -1,5 +1,6 @@
 #include <lua.hpp>
 #include <iostream>
+#include <CppFunctions.h>
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
@@ -15,13 +16,6 @@ extern "C"
     }
 }
 #endif
-
-int UltimateFunction(lua_State* pL)
-{
-    std::cout << "C++ Ultimate Function !!" << std::endl;
-
-    return 0;  // returnで戻り値の数を返す。今回は何も返さないので0
-}
 
 int main()
 {
@@ -52,10 +46,12 @@ int main()
     const char* script = R"(
         var0 = 1 + 2;
         print(var0);
-        Ultimate();
+        UltimateFunction();
     )";
 
-    lua_register(pL, "Ultimate", &UltimateFunction);
+    auto func = CppFunctions::GetFunction("UltimateFunction");
+
+    lua_register(pL, "UltimateFunction", func);
 
     if (luaL_dostring(pL, script) != LUA_OK)
     {
