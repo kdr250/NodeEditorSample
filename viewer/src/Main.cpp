@@ -1,8 +1,5 @@
 #include <lua.hpp>
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstdio>
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
