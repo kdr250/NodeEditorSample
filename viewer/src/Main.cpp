@@ -16,6 +16,13 @@ extern "C"
 }
 #endif
 
+int UltimateFunction(lua_State* pL)
+{
+    std::cout << "C++ Ultimate Function !!" << std::endl;
+
+    return 0;  // returnで戻り値の数を返す。今回は何も返さないので0
+}
+
 int main()
 {
 #ifdef __EMSCRIPTEN__
@@ -42,7 +49,15 @@ int main()
 
     const char* path = "resources/output.lua";
 
-    if (luaL_dofile(pL, path) != LUA_OK)
+    const char* script = R"(
+        var0 = 1 + 2;
+        print(var0);
+        Ultimate();
+    )";
+
+    lua_register(pL, "Ultimate", &UltimateFunction);
+
+    if (luaL_dostring(pL, script) != LUA_OK)
     {
         std::cout << "Failed to execute Lua: " << lua_tostring(pL, lua_gettop(pL)) << std::endl;
         lua_close(pL);
