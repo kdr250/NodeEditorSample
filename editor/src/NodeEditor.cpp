@@ -24,7 +24,7 @@ namespace example
         // clang-format off
         EM_ASM(
             FS.mkdir('/resources');
-            FS.mount(IDBFS, {}, '/resources');
+            FS.mount(IDBFS, {autoPersist: true}, '/resources');
             FS.syncfs(true, function (err) {
               assert(!err);
             });
@@ -633,14 +633,4 @@ void NodeEditor::saveFile(std::stringstream& luaSource)
 {
     std::ofstream file("resources/output.lua");
     file << luaSource.str();
-
-#ifdef __EMSCRIPTEN__
-    // clang-format off
-        EM_ASM(
-            FS.syncfs(false, function (err) {
-                assert(!err);
-            });
-        );
-    // clang-format on
-#endif
 }
