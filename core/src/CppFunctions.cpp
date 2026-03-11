@@ -1,6 +1,6 @@
 #include "CppFunctions.h"
 #include <iostream>
-#include <lua.hpp>
+#include <ranges>
 
 int UltimateFunction(lua_State* pL)
 {
@@ -31,24 +31,18 @@ int UltimateFunction2(lua_State* pL)
     return 1;
 }
 
-void* CppFunctions::GetFunction(const std::string& functionName)
-{
-    if (functionName == "UltimateFunction")
-    {
-        return (void*)UltimateFunction;
-    }
-    else if (functionName == "UltimateFunction2")
-    {
-        return (void*)UltimateFunction2;
-    }
-
-    return nullptr;
-}
-
 std::vector<std::string> CppFunctions::GetFunctionNames()
 {
+    auto map      = GetFunctions();
+    auto keysView = map | std::views::keys;
+    std::vector<std::string> keys(keysView.begin(), keysView.end());
+    return keys;
+}
+
+std::unordered_map<std::string, lua_CFunction> CppFunctions::GetFunctions()
+{
     return {
-        "UltimateFunction",
-        "UltimateFunction2",
+        {"UltimateFunction", UltimateFunction},
+        {"UltimateFunction2", UltimateFunction2},
     };
 }

@@ -51,11 +51,10 @@ int main()
         print(var2);
     )";
 
-    auto func = CppFunctions::GetFunction("UltimateFunction");
-    lua_register(pL, "UltimateFunction", reinterpret_cast<lua_CFunction>(func));
-
-    auto func2 = CppFunctions::GetFunction("UltimateFunction2");
-    lua_register(pL, "UltimateFunction2", reinterpret_cast<lua_CFunction>(func2));
+    for (auto& [name, func] : CppFunctions::GetFunctions())
+    {
+        lua_register(pL, name.c_str(), func);
+    }
 
     if (luaL_dostring(pL, script) != LUA_OK)
     {
