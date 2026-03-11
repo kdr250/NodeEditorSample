@@ -46,12 +46,16 @@ int main()
     const char* script = R"(
         var0 = 1 + 2;
         print(var0);
-        UltimateFunction();
+        var1 = UltimateFunction(var0);
+        var2 = UltimateFunction2(var1);
+        print(var2);
     )";
 
     auto func = CppFunctions::GetFunction("UltimateFunction");
+    lua_register(pL, "UltimateFunction", reinterpret_cast<lua_CFunction>(func));
 
-    lua_register(pL, "UltimateFunction", func);
+    auto func2 = CppFunctions::GetFunction("UltimateFunction2");
+    lua_register(pL, "UltimateFunction2", reinterpret_cast<lua_CFunction>(func2));
 
     if (luaL_dostring(pL, script) != LUA_OK)
     {

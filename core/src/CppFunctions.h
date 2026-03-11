@@ -1,24 +1,12 @@
 #pragma once
 
-#include <unordered_map>
 #include <string>
-#include <iostream>
+#include <vector>
 
-struct lua_State;
-using lua_CFunction = int (*)(lua_State* L);
-
-int UltimateFunction(lua_State* pL);
-
-struct CppFunctions
+namespace CppFunctions
 {
-    static lua_CFunction GetFunction(const std::string& functionName)
-    {
-        // std::unordered_map<std::string, lua_CFunction> hoge;
-        // hoge.emplace("UltimateFunction", UltimateFunction);
+    void* GetFunction(const std::string& functionName);
 
-        if (functionName == "UltimateFunction")
-        {
-            return UltimateFunction;
-        }
-    }
-};
+    std::vector<std::string> GetFunctionNames();
+
+};  // namespace CppFunctions

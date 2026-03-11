@@ -6,7 +6,7 @@ endif()
 
 find_package(Lua REQUIRED)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable(
     viewer
