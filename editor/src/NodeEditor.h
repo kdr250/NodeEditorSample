@@ -2,7 +2,7 @@
 
 #include <imnodes.h>
 #include <imgui.h>
-#include <sstream>
+#include <utility>
 #include "Graph.h"
 
 enum class NodeType
@@ -32,14 +32,13 @@ public:
 
     void show();
 
+    std::pair<const example::Graph<Node>, const int> getGraph() const;
+    bool canEvaluate() const;
+
 private:
     NodeEditor();
     NodeEditor(const NodeEditor&)            = delete;
     NodeEditor& operator=(const NodeEditor&) = delete;
-
-    std::stringstream evaluate(const example::Graph<Node>& graph, const int root_node);
-
-    void saveFile(std::stringstream& luaSource);
 
     enum class UiNodeType
     {
@@ -86,6 +85,8 @@ private:
     std::vector<UiNode> nodes_;
     int root_node_id_;
     ImNodesMiniMapLocation minimap_location_;
+
+    bool isSavePressed = false;
 };
 
 namespace example

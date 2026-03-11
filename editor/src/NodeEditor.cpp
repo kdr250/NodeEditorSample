@@ -7,7 +7,7 @@
 #include <chrono>
 #include <cmath>
 #include <vector>
-#include <fstream>
+#include "LuaScriptBuilder.h"
 
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
@@ -41,6 +41,13 @@ namespace example
     {
         auto color_editor = NodeEditor::Instance();
         color_editor->show();
+
+        if (color_editor->canEvaluate())
+        {
+            auto [graph, rootId]     = color_editor->getGraph();
+            std::stringstream source = LuaScriptBuilder::Evaluate(graph, rootId);
+            LuaScriptBuilder::SaveFile(source);
+        }
     }
 
     void NodeEditorShutdown() {}
@@ -121,7 +128,7 @@ void NodeEditor::show()
     ImGui::TextUnformatted("A -- add node");
     ImGui::TextUnformatted("X -- delete selected node or link");
     ImGui::NextColumn();
-    bool isEvaluatePressed = ImGui::Button("evaluate", ImVec2(80, 20));
+    isSavePressed = ImGui::Button("Save", ImVec2(80, 20));
     ImGui::Columns(1);
 
     ImNodes::BeginNodeEditor();
@@ -534,103 +541,14 @@ void NodeEditor::show()
     }
 
     ImGui::End();
-
-    // into Lua
-    if (isEvaluatePressed && root_node_id_ != -1)
-    {
-        auto luaSource = evaluate(graph_, root_node_id_);
-        saveFile(luaSource);
-    }
 }
 
-std::stringstream NodeEditor::evaluate(const example::Graph<Node>& graph, const int root_node)
+std::pair<const example::Graph<Node>, const int> NodeEditor::getGraph() const
 {
-    std::stringstream result;
-
-    std::stack<int> postorder;
-    dfs_traverse(graph,
-                 root_node,
-                 [&postorder](const int node_id) -> void
-                 {
-                     postorder.push(node_id);
-                 });
-
-    std::stack<std::string> code_stack;
-    unsigned int variable_id = 0;
-    while (!postorder.empty())
-    {
-        const int id = postorder.top();
-        postorder.pop();
-        const Node node = graph.node(id);
-
-        switch (node.type)
-        {
-            case NodeType::add:
-            {
-                std::string rhs = code_stack.top();
-                code_stack.pop();
-                std::string lhs = code_stack.top();
-                code_stack.pop();
-                std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << lhs << " + " << rhs << ";" << std::endl;
-                code_stack.push(varId);
-            }
-            break;
-            case NodeType::multiply:
-            {
-                std::string rhs = code_stack.top();
-                code_stack.pop();
-                std::string lhs = code_stack.top();
-                code_stack.pop();
-                std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << lhs << " * " << rhs << ";" << std::endl;
-                code_stack.push(varId);
-            }
-            break;
-            case NodeType::sine:
-            {
-                std::string x = code_stack.top();
-                code_stack.pop();
-                std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << "math.sin(" << x << ");" << std::endl;
-                code_stack.push(varId);
-            }
-            break;
-            case NodeType::time:
-            {
-                std::string varId = "var" + std::to_string(variable_id++);
-                result << varId << " = " << "os.clock();" << std::endl;
-                code_stack.push(varId);
-            }
-            break;
-            case NodeType::value:
-            {
-                // If the edge does not have an edge connecting to another node, then just use the value
-                // at this node. It means the node's input pin has not been connected to anything and
-                // the value comes from the node's UI.
-                if (graph.num_edges_from_node(id) == 0ull)
-                {
-                    code_stack.push(std::to_string(node.value));
-                }
-            }
-            break;
-            case NodeType::print:
-            {
-                std::string input = code_stack.top();
-                code_stack.pop();
-                result << "print(" << input << ");" << std::endl;
-            }
-            break;
-            default:
-                break;
-        }
-    }
-
-    return result;
+    return std::make_pair(graph_, root_node_id_);
 }
 
-void NodeEditor::saveFile(std::stringstream& luaSource)
+bool NodeEditor::canEvaluate() const
 {
-    std::ofstream file("resources/output.lua");
-    file << luaSource.str();
+    return isSavePressed && root_node_id_ != -1;
 }
