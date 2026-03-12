@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cmath>
 #include <vector>
+#include <FunctionNode.h>
 #include "LuaScriptBuilder.h"
 
 #ifdef __EMSCRIPTEN__
@@ -149,22 +150,13 @@ void NodeEditor::show()
         {
             const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
 
+            auto functionNodes = FunctionNode::Get();
+
             if (ImGui::MenuItem("add"))
             {
-                const Node value(NodeType::value, 0.f);
-                const Node op(NodeType::add);
-
-                UiNode ui_node;
-                ui_node.type       = UiNodeType::add;
-                ui_node.ui.add.lhs = graph_.insert_node(value);
-                ui_node.ui.add.rhs = graph_.insert_node(value);
-                ui_node.id         = graph_.insert_node(op);
-
-                graph_.insert_edge(ui_node.id, ui_node.ui.add.lhs);
-                graph_.insert_edge(ui_node.id, ui_node.ui.add.rhs);
-
-                nodes_.push_back(ui_node);
-                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
+                auto addNodeFunctions = functionNodes[0];
+                auto ui_node_id       = addNodeFunctions.mInsertGraphFunction(graph_, nodes_);
+                ImNodes::SetNodeScreenSpacePos(ui_node_id, click_pos);
             }
 
             if (ImGui::MenuItem("multiply"))

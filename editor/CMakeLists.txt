@@ -14,10 +14,10 @@ add_executable(
     ${SOURCES}
 )
 
-# target_link_libraries(
-#     editor PRIVATE
-#     core
-# )
+target_link_libraries(
+    editor PRIVATE
+    core
+)
 
 if (EMSCRIPTEN)
 
