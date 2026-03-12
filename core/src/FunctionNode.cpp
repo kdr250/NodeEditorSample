@@ -337,20 +337,143 @@ namespace Time
 
 }  // namespace Time
 
-namespace Hoge
+namespace Ultimate
 {
     std::string Name()
     {
-        return "hoge";
+        return "ultimate";
     };
+
     int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
     {
+        const Node value(NodeType::value, 0.f);
+        const Node op(NodeType::ultimate);
+
         UiNode ui_node;
+        ui_node.type              = UiNodeType::ultimate;
+        ui_node.ui.ultimate.input = graph.insert_node(value);
+        ui_node.id                = graph.insert_node(op);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.ultimate.input);
+
+        nodes.push_back(ui_node);
         return ui_node.id;
     }
-    void Show(Graph<Node>& graph, const UiNode& node) {}
-    void Erase(Graph<Node>& graph, const UiNode& uiNode) {}
-}  // namespace Hoge
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.0f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("ultimate");
+        ImNodes::EndNodeTitleBar();
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.ultimate.input);
+            const float label_width = ImGui::CalcTextSize("number").x;
+            ImGui::TextUnformatted("number");
+            if (graph.num_edges_from_node(node.ui.ultimate.input) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel",
+                                 &graph.node(node.ui.ultimate.input).value,
+                                 0.01f,
+                                 0.f,
+                                 1.0f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.id);
+            const float label_width = ImGui::CalcTextSize("output").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted("output");
+            ImNodes::EndOutputAttribute();
+        }
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.ultimate.input);
+    }
+}  // namespace Ultimate
+
+namespace Ultimate2
+{
+    std::string Name()
+    {
+        return "ultimate2";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        const Node value(NodeType::value, 0.f);
+        const Node op(NodeType::ultimate2);
+
+        UiNode ui_node;
+        ui_node.type               = UiNodeType::ultimate2;
+        ui_node.ui.ultimate2.input = graph.insert_node(value);
+        ui_node.id                 = graph.insert_node(op);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.ultimate2.input);
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.0f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("ultimate2");
+        ImNodes::EndNodeTitleBar();
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.ultimate2.input);
+            const float label_width = ImGui::CalcTextSize("number").x;
+            ImGui::TextUnformatted("number");
+            if (graph.num_edges_from_node(node.ui.ultimate2.input) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel",
+                                 &graph.node(node.ui.ultimate2.input).value,
+                                 0.01f,
+                                 0.f,
+                                 1.0f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.id);
+            const float label_width = ImGui::CalcTextSize("output").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted("output");
+            ImNodes::EndOutputAttribute();
+        }
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.ultimate2.input);
+    }
+}  // namespace Ultimate2
 
 std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
 {
@@ -360,6 +483,8 @@ std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
         {UiNodeType::multiply, {Multiply::Name(), Multiply::Insert, Multiply::Show, Multiply::Erase}},
         {UiNodeType::sine, {Sine::Name(), Sine::Insert, Sine::Show, Sine::Erase}},
         {UiNodeType::time, {Time::Name(), Time::Insert, Time::Show, Time::Erase}},
+        {UiNodeType::ultimate, {Ultimate::Name(), Ultimate::Insert, Ultimate::Show, Ultimate::Erase}},
+        {UiNodeType::ultimate2, {Ultimate2::Name(), Ultimate2::Insert, Ultimate2::Show, Ultimate2::Erase}},
         {UiNodeType::print, {Print::Name(), Print::Insert, Print::Show, Print::Erase, true}},
     };
     // clang-format on

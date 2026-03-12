@@ -171,38 +171,6 @@ void NodeEditor::show()
                 }
             }
 
-            if (ImGui::MenuItem("ultimate"))
-            {
-                const Node value(NodeType::value, 0.f);
-                const Node op(NodeType::ultimate);
-
-                UiNode ui_node;
-                ui_node.type              = UiNodeType::ultimate;
-                ui_node.ui.ultimate.input = graph_.insert_node(value);
-                ui_node.id                = graph_.insert_node(op);
-
-                graph_.insert_edge(ui_node.id, ui_node.ui.ultimate.input);
-
-                nodes_.push_back(ui_node);
-                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
-            }
-
-            if (ImGui::MenuItem("ultimate2"))
-            {
-                const Node value(NodeType::value, 0.f);
-                const Node op(NodeType::ultimate2);
-
-                UiNode ui_node;
-                ui_node.type               = UiNodeType::ultimate2;
-                ui_node.ui.ultimate2.input = graph_.insert_node(value);
-                ui_node.id                 = graph_.insert_node(op);
-
-                graph_.insert_edge(ui_node.id, ui_node.ui.ultimate2.input);
-
-                nodes_.push_back(ui_node);
-                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
-            }
-
             ImGui::EndPopup();
         }
         ImGui::PopStyleVar();
@@ -210,101 +178,8 @@ void NodeEditor::show()
 
     for (const UiNode& node : nodes_)
     {
-        switch (node.type)
-        {
-            case UiNodeType::add:
-            case UiNodeType::multiply:
-            case UiNodeType::sine:
-            case UiNodeType::time:
-            case UiNodeType::print:
-            {
-                auto functionNode = functionNodes[node.type];
-                functionNode.mShowFunction(graph_, node);
-            }
-            break;
-
-            case UiNodeType::ultimate:
-            {
-                const float node_width = 100.0f;
-                ImNodes::BeginNode(node.id);
-
-                ImNodes::BeginNodeTitleBar();
-                ImGui::TextUnformatted("ultimate");
-                ImNodes::EndNodeTitleBar();
-
-                {
-                    ImNodes::BeginInputAttribute(node.ui.ultimate.input);
-                    const float label_width = ImGui::CalcTextSize("number").x;
-                    ImGui::TextUnformatted("number");
-                    if (graph_.num_edges_from_node(node.ui.ultimate.input) == 0ull)
-                    {
-                        ImGui::SameLine();
-                        ImGui::PushItemWidth(node_width - label_width);
-                        ImGui::DragFloat("##hidelabel",
-                                         &graph_.node(node.ui.ultimate.input).value,
-                                         0.01f,
-                                         0.f,
-                                         1.0f);
-                        ImGui::PopItemWidth();
-                    }
-                    ImNodes::EndInputAttribute();
-                }
-
-                ImGui::Spacing();
-
-                {
-                    ImNodes::BeginOutputAttribute(node.id);
-                    const float label_width = ImGui::CalcTextSize("output").x;
-                    ImGui::Indent(node_width - label_width);
-                    ImGui::TextUnformatted("output");
-                    ImNodes::EndOutputAttribute();
-                }
-
-                ImNodes::EndNode();
-            }
-            break;
-
-            case UiNodeType::ultimate2:
-            {
-                const float node_width = 100.0f;
-                ImNodes::BeginNode(node.id);
-
-                ImNodes::BeginNodeTitleBar();
-                ImGui::TextUnformatted("ultimate2");
-                ImNodes::EndNodeTitleBar();
-
-                {
-                    ImNodes::BeginInputAttribute(node.ui.ultimate2.input);
-                    const float label_width = ImGui::CalcTextSize("number").x;
-                    ImGui::TextUnformatted("number");
-                    if (graph_.num_edges_from_node(node.ui.ultimate2.input) == 0ull)
-                    {
-                        ImGui::SameLine();
-                        ImGui::PushItemWidth(node_width - label_width);
-                        ImGui::DragFloat("##hidelabel",
-                                         &graph_.node(node.ui.ultimate2.input).value,
-                                         0.01f,
-                                         0.f,
-                                         1.0f);
-                        ImGui::PopItemWidth();
-                    }
-                    ImNodes::EndInputAttribute();
-                }
-
-                ImGui::Spacing();
-
-                {
-                    ImNodes::BeginOutputAttribute(node.id);
-                    const float label_width = ImGui::CalcTextSize("output").x;
-                    ImGui::Indent(node_width - label_width);
-                    ImGui::TextUnformatted("output");
-                    ImNodes::EndOutputAttribute();
-                }
-
-                ImNodes::EndNode();
-            }
-            break;
-        }
+        auto functionNode = functionNodes[node.type];
+        functionNode.mShowFunction(graph_, node);
     }
 
     for (const auto& edge : graph_.edges())
@@ -386,20 +261,9 @@ void NodeEditor::show()
                                              return node.id == node_id;
                                          });
                 // Erase any additional internal nodes
-                switch (iter->type)
-                {
-                    case UiNodeType::add:
-                    case UiNodeType::multiply:
-                    case UiNodeType::sine:
-                    case UiNodeType::print:
-                    {
-                        auto functionNode = functionNodes[iter->type];
-                        functionNode.mEraseGraphFunction(graph_, *iter);
-                    }
-                    break;
-                    default:
-                        break;
-                }
+                auto functionNode = functionNodes[iter->type];
+                functionNode.mEraseGraphFunction(graph_, *iter);
+
                 nodes_.erase(iter);
             }
         }
