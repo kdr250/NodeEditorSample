@@ -156,8 +156,18 @@ void NodeEditor::show()
             {
                 if (ImGui::MenuItem(functionNode.mName.c_str()))
                 {
+                    if (functionNode.mIsRootNode && root_node_id_ != -1)
+                    {
+                        continue;
+                    }
+
                     auto ui_node_id = functionNode.mInsertGraphFunction(graph_, nodes_);
                     ImNodes::SetNodeScreenSpacePos(ui_node_id, click_pos);
+
+                    if (functionNode.mIsRootNode)
+                    {
+                        root_node_id_ = ui_node_id;
+                    }
                 }
             }
 
@@ -203,23 +213,6 @@ void NodeEditor::show()
                 ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
             }
 
-            if (ImGui::MenuItem("print") && root_node_id_ == -1)
-            {
-                const Node value(NodeType::value, 0.f);
-                const Node print(NodeType::print);
-
-                UiNode ui_node;
-                ui_node.type           = UiNodeType::print;
-                ui_node.ui.print.input = graph_.insert_node(value);
-                ui_node.id             = graph_.insert_node(print);
-
-                graph_.insert_edge(ui_node.id, ui_node.ui.sine.input);
-
-                nodes_.push_back(ui_node);
-                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
-                root_node_id_ = ui_node.id;
-            }
-
             ImGui::EndPopup();
         }
         ImGui::PopStyleVar();
@@ -232,6 +225,7 @@ void NodeEditor::show()
             case UiNodeType::add:
             case UiNodeType::multiply:
             case UiNodeType::sine:
+            case UiNodeType::print:
             {
                 auto functionNode = functionNodes[node.type];
                 functionNode.mShowFunction(graph_, node);
@@ -335,44 +329,6 @@ void NodeEditor::show()
                 ImNodes::EndNode();
             }
             break;
-
-            case UiNodeType::print:
-            {
-                const float node_width = 100.0f;
-                ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(11, 109, 191, 255));
-                ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(45, 126, 194, 255));
-                ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(81, 148, 204, 255));
-                ImNodes::BeginNode(node.id);
-
-                ImNodes::BeginNodeTitleBar();
-                ImGui::TextUnformatted("print");
-                ImNodes::EndNodeTitleBar();
-
-                ImGui::Dummy(ImVec2(node_width, 0.f));
-                {
-                    ImNodes::BeginInputAttribute(node.ui.print.input);
-                    const float label_width = ImGui::CalcTextSize("input").x;
-                    ImGui::TextUnformatted("input");
-                    if (graph_.num_edges_from_node(node.ui.print.input) == 0ull)
-                    {
-                        ImGui::SameLine();
-                        ImGui::PushItemWidth(node_width - label_width);
-                        ImGui::DragFloat("##hidelabel",
-                                         &graph_.node(node.ui.print.input).value,
-                                         0.01f,
-                                         0.f,
-                                         1.0f);
-                        ImGui::PopItemWidth();
-                    }
-                    ImNodes::EndInputAttribute();
-                }
-
-                ImNodes::EndNode();
-                ImNodes::PopColorStyle();
-                ImNodes::PopColorStyle();
-                ImNodes::PopColorStyle();
-            }
-            break;
         }
     }
 
@@ -460,14 +416,12 @@ void NodeEditor::show()
                     case UiNodeType::add:
                     case UiNodeType::multiply:
                     case UiNodeType::sine:
+                    case UiNodeType::print:
                     {
                         auto functionNode = functionNodes[iter->type];
                         functionNode.mEraseGraphFunction(graph_, *iter);
                     }
                     break;
-                    case UiNodeType::print:
-                        graph_.erase_node(iter->ui.print.input);
-                        break;
                     default:
                         break;
                 }

@@ -235,6 +235,83 @@ namespace Sine
     }
 }  // namespace Sine
 
+namespace Print
+{
+    std::string Name()
+    {
+        return "print";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        const Node value(NodeType::value, 0.f);
+        const Node print(NodeType::print);
+
+        UiNode ui_node;
+        ui_node.type           = UiNodeType::print;
+        ui_node.ui.print.input = graph.insert_node(value);
+        ui_node.id             = graph.insert_node(print);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.print.input);
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.0f;
+        ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(11, 109, 191, 255));
+        ImNodes::PushColorStyle(ImNodesCol_TitleBarHovered, IM_COL32(45, 126, 194, 255));
+        ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(81, 148, 204, 255));
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("print");
+        ImNodes::EndNodeTitleBar();
+
+        ImGui::Dummy(ImVec2(node_width, 0.f));
+        {
+            ImNodes::BeginInputAttribute(node.ui.print.input);
+            const float label_width = ImGui::CalcTextSize("input").x;
+            ImGui::TextUnformatted("input");
+            if (graph.num_edges_from_node(node.ui.print.input) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel",
+                                 &graph.node(node.ui.print.input).value,
+                                 0.01f,
+                                 0.f,
+                                 1.0f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImNodes::EndNode();
+        ImNodes::PopColorStyle();
+        ImNodes::PopColorStyle();
+        ImNodes::PopColorStyle();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.print.input);
+    }
+}  // namespace Print
+
+namespace Hoge
+{
+    std::string Name()
+    {
+        return "hoge";
+    };
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes) {}
+    void Show(Graph<Node>& graph, const UiNode& node) {}
+    void Erase(Graph<Node>& graph, const UiNode& uiNode) {}
+}  // namespace Hoge
+
 std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
 {
     // clang-format off
@@ -242,6 +319,7 @@ std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
         {UiNodeType::add, {Add::Name(), Add::Insert, Add::Show, Add::Erase}},
         {UiNodeType::multiply, {Multiply::Name(), Multiply::Insert, Multiply::Show, Multiply::Erase}},
         {UiNodeType::sine, {Sine::Name(), Sine::Insert, Sine::Show, Sine::Erase}},
+        {UiNodeType::print, {Print::Name(), Print::Insert, Print::Show, Print::Erase, true}},
     };
     // clang-format on
 }

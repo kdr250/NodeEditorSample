@@ -14,6 +14,7 @@ struct FunctionNode
     std::function<int(Graph<Node>&, std::vector<UiNode>&)> mInsertGraphFunction;
     std::function<void(Graph<Node>&, const UiNode&)> mShowFunction;
     std::function<void(Graph<Node>&, const UiNode&)> mEraseGraphFunction;
+    bool mIsRootNode = false;
 
     static std::unordered_map<UiNodeType, FunctionNode> Get();
 };
