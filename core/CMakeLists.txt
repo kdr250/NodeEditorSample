@@ -5,6 +5,7 @@ if (EMSCRIPTEN)
 endif()
 
 find_package(Lua REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
@@ -17,6 +18,8 @@ if (EMSCRIPTEN)
 
     target_link_libraries(
         core PRIVATE
+        imgui::imgui
+        imnodes
         ${LUA_LIBRARIES}
     )
 
@@ -29,6 +32,8 @@ else()
 
     target_link_libraries(
         core PRIVATE
+        imgui::imgui
+        imnodes
         ${LUA_LIBRARIES}
     )
 

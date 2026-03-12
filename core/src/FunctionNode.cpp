@@ -1,7 +1,15 @@
 #include "FunctionNode.h"
 
+#include <imgui.h>
+#include <imnodes.h>
+
 namespace Add
 {
+    std::string Name()
+    {
+        return "add";
+    };
+
     int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
     {
         const Node value(NodeType::value, 0.f);
@@ -20,9 +28,53 @@ namespace Add
         return ui_node.id;
     }
 
-    void Show()
+    void Show(Graph<Node>& graph, const UiNode& node)
     {
-        // TODO
+        const float node_width = 100.f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("add");
+        ImNodes::EndNodeTitleBar();
+        {
+            ImNodes::BeginInputAttribute(node.ui.add.lhs);
+            const float label_width = ImGui::CalcTextSize("left").x;
+            ImGui::TextUnformatted("left");
+            if (graph.num_edges_from_node(node.ui.add.lhs) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel", &graph.node(node.ui.add.lhs).value, 0.01f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.add.rhs);
+            const float label_width = ImGui::CalcTextSize("right").x;
+            ImGui::TextUnformatted("right");
+            if (graph.num_edges_from_node(node.ui.add.rhs) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel", &graph.node(node.ui.add.rhs).value, 0.01f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.id);
+            const float label_width = ImGui::CalcTextSize("result").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted("result");
+            ImNodes::EndOutputAttribute();
+        }
+
+        ImNodes::EndNode();
     }
 
     void Erase(Graph<Node>& graph, const UiNode& uiNode)
@@ -32,9 +84,9 @@ namespace Add
     }
 };  // namespace Add
 
-std::vector<FunctionNode> FunctionNode::Get()
+std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
 {
     return {
-        {Add::Insert, Add::Show, Add::Erase},
+        {UiNodeType::add, {Add::Name(), Add::Insert, Add::Show, Add::Erase}},
     };
 }
