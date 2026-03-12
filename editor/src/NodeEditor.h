@@ -16,6 +16,8 @@ public:
     std::pair<const example::Graph<Node>, const int> getGraph() const;
     bool canEvaluate() const;
 
+    void saveFile(std::stringstream& luaSource);
+
 private:
     NodeEditor();
     NodeEditor(const NodeEditor&)            = delete;

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <fstream>
 #include <cmath>
 #include <vector>
 #include <FunctionNode.h>
@@ -47,7 +48,7 @@ namespace example
         {
             auto [graph, rootId]     = color_editor->getGraph();
             std::stringstream source = LuaScriptBuilder::Evaluate(graph, rootId);
-            LuaScriptBuilder::SaveFile(source);
+            color_editor->saveFile(source);
         }
     }
 
@@ -57,6 +58,12 @@ namespace example
 NodeEditor::NodeEditor() :
     graph_(), nodes_(), root_node_id_(-1), minimap_location_(ImNodesMiniMapLocation_BottomRight)
 {
+}
+
+void NodeEditor::saveFile(std::stringstream& luaSource)
+{
+    std::ofstream file("resources/output.lua");
+    file << luaSource.str();
 }
 
 NodeEditor* NodeEditor::Instance()

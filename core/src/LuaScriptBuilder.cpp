@@ -1,7 +1,5 @@
 #include "LuaScriptBuilder.h"
 
-#include <fstream>
-
 std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, const int root_node)
 {
     std::stringstream result;
@@ -107,10 +105,4 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
     }
 
     return result;
-}
-
-void LuaScriptBuilder::SaveFile(std::stringstream& luaSource)
-{
-    std::ofstream file("resources/output.lua");
-    file << luaSource.str();
 }
