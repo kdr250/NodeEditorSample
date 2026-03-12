@@ -301,13 +301,53 @@ namespace Print
     }
 }  // namespace Print
 
+namespace Time
+{
+    std::string Name()
+    {
+        return "time";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        UiNode ui_node;
+        ui_node.type = UiNodeType::time;
+        ui_node.id   = graph.insert_node(Node(NodeType::time));
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("time");
+        ImNodes::EndNodeTitleBar();
+
+        ImNodes::BeginOutputAttribute(node.id);
+        ImGui::Text("output");
+        ImNodes::EndOutputAttribute();
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode) {}
+
+}  // namespace Time
+
 namespace Hoge
 {
     std::string Name()
     {
         return "hoge";
     };
-    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes) {}
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        UiNode ui_node;
+        return ui_node.id;
+    }
     void Show(Graph<Node>& graph, const UiNode& node) {}
     void Erase(Graph<Node>& graph, const UiNode& uiNode) {}
 }  // namespace Hoge
@@ -319,6 +359,7 @@ std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
         {UiNodeType::add, {Add::Name(), Add::Insert, Add::Show, Add::Erase}},
         {UiNodeType::multiply, {Multiply::Name(), Multiply::Insert, Multiply::Show, Multiply::Erase}},
         {UiNodeType::sine, {Sine::Name(), Sine::Insert, Sine::Show, Sine::Erase}},
+        {UiNodeType::time, {Time::Name(), Time::Insert, Time::Show, Time::Erase}},
         {UiNodeType::print, {Print::Name(), Print::Insert, Print::Show, Print::Erase, true}},
     };
     // clang-format on

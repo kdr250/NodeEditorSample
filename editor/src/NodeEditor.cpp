@@ -171,16 +171,6 @@ void NodeEditor::show()
                 }
             }
 
-            if (ImGui::MenuItem("time"))
-            {
-                UiNode ui_node;
-                ui_node.type = UiNodeType::time;
-                ui_node.id   = graph_.insert_node(Node(NodeType::time));
-
-                nodes_.push_back(ui_node);
-                ImNodes::SetNodeScreenSpacePos(ui_node.id, click_pos);
-            }
-
             if (ImGui::MenuItem("ultimate"))
             {
                 const Node value(NodeType::value, 0.f);
@@ -225,26 +215,11 @@ void NodeEditor::show()
             case UiNodeType::add:
             case UiNodeType::multiply:
             case UiNodeType::sine:
+            case UiNodeType::time:
             case UiNodeType::print:
             {
                 auto functionNode = functionNodes[node.type];
                 functionNode.mShowFunction(graph_, node);
-            }
-            break;
-
-            case UiNodeType::time:
-            {
-                ImNodes::BeginNode(node.id);
-
-                ImNodes::BeginNodeTitleBar();
-                ImGui::TextUnformatted("time");
-                ImNodes::EndNodeTitleBar();
-
-                ImNodes::BeginOutputAttribute(node.id);
-                ImGui::Text("output");
-                ImNodes::EndOutputAttribute();
-
-                ImNodes::EndNode();
             }
             break;
 
