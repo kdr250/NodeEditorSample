@@ -2,6 +2,7 @@
 
 enum class NodeType
 {
+    execute,
     add,
     multiply,
     sine,
@@ -60,16 +61,19 @@ struct UiNode
 
         struct
         {
+            int execute;
             int input;
         } print;
 
         struct
         {
+            int execute;
             int input;
         } ultimate;
 
         struct
         {
+            int execute;
             int input;
         } ultimate2;
     } ui;

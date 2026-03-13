@@ -194,7 +194,8 @@ void NodeEditor::show()
         // If edge doesn't start at value, then it's an internal edge, i.e.
         // an edge which links a node's operation to its input. We don't
         // want to render node internals with visible links.
-        if (graph_.node(edge.from).type != NodeType::value)
+        if (graph_.node(edge.from).type != NodeType::value
+            && graph_.node(edge.from).type != NodeType::execute)
             continue;
 
         ImNodes::Link(edge.id, edge.from, edge.to);
@@ -218,7 +219,7 @@ void NodeEditor::show()
             {
                 // Ensure the edge is always directed from the value to
                 // whatever produces the value
-                if (start_type != NodeType::value)
+                if (start_type != NodeType::value && start_type != NodeType::execute)
                 {
                     std::swap(start_attr, end_attr);
                 }
