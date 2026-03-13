@@ -8,12 +8,9 @@ int UltimateFunction(lua_State* pL)
     const lua_Number num = lua_tonumber(pL, 1);
     lua_pop(pL, lua_gettop(pL));
 
-    // Set return value to Lua
-    lua_pushnumber(pL, num);
+    std::cout << "C++ Ultimate Function! input : " << num << std::endl;
 
-    std::cout << "C++ Ultimate Function! input value: " << num << std::endl;
-
-    return 1;
+    return 0;
 }
 
 int UltimateFunction2(lua_State* pL)
@@ -22,13 +19,11 @@ int UltimateFunction2(lua_State* pL)
     const lua_Number num = lua_tonumber(pL, 1);
     lua_pop(pL, lua_gettop(pL));
 
-    // Set return value to Lua
-    const int result = static_cast<int>(num) * 2;
-    lua_pushnumber(pL, result);
+    const float result = static_cast<float>(num) * 2;
 
-    std::cout << "C++ Ultimate Function 2! input: " << num << ", output: " << result << std::endl;
+    std::cout << "C++ Ultimate Function 2! input: " << num << ", x2 = " << result << std::endl;
 
-    return 1;
+    return 0;
 }
 
 std::vector<std::string> CppFunctions::GetFunctionNames()

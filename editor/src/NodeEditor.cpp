@@ -214,7 +214,10 @@ void NodeEditor::show()
             const NodeType start_type = graph_.node(start_attr).type;
             const NodeType end_type   = graph_.node(end_attr).type;
 
-            const bool valid_link = start_type != end_type;
+            const PinType start_pin_type = graph_.node(start_attr).pinType;
+            const PinType end_pin_type   = graph_.node(end_attr).pinType;
+
+            const bool valid_link = (start_type != end_type) && (start_pin_type == end_pin_type);
             if (valid_link)
             {
                 // Ensure the edge is always directed from the value to

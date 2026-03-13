@@ -24,14 +24,49 @@ enum class UiNodeType
     ultimate2,
 };
 
+enum class PinType
+{
+    value,
+    execute,
+};
+
+static inline PinType GetPinType(NodeType nodeType)
+{
+    switch (nodeType)
+    {
+        case NodeType::add:
+        case NodeType::multiply:
+        case NodeType::sine:
+        case NodeType::time:
+        case NodeType::value:
+            return PinType::value;
+
+        case NodeType::execute:
+        case NodeType::print:
+        case NodeType::ultimate:
+        case NodeType::ultimate2:
+            return PinType::execute;
+
+        default:
+            break;
+    }
+}
+
 struct Node
 {
     NodeType type;
+    PinType pinType;
     float value;
 
-    explicit Node(const NodeType t) : type(t), value(0.f) {}
+    explicit Node(const NodeType t) : type(t), value(0.f)
+    {
+        pinType = GetPinType(type);
+    }
 
-    Node(const NodeType t, const float v) : type(t), value(v) {}
+    Node(const NodeType t, const float v) : type(t), value(v)
+    {
+        pinType = GetPinType(type);
+    }
 };
 
 struct UiNode
