@@ -211,11 +211,14 @@ void NodeEditor::show()
         int start_attr, end_attr;
         if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
         {
-            const NodeType start_type = graph_.node(start_attr).type;
-            const NodeType end_type   = graph_.node(end_attr).type;
+            auto& start_node = graph_.node(start_attr);
+            auto& end_node   = graph_.node(end_attr);
 
-            const PinType start_pin_type = graph_.node(start_attr).pinType;
-            const PinType end_pin_type   = graph_.node(end_attr).pinType;
+            const NodeType start_type = start_node.type;
+            const NodeType end_type   = end_node.type;
+
+            const PinType start_pin_type = Node::GetPinType(start_type);
+            const PinType end_pin_type   = Node::GetPinType(end_type);
 
             const bool valid_link = (start_type != end_type) && (start_pin_type == end_pin_type);
             if (valid_link)

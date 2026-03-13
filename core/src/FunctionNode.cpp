@@ -367,15 +367,18 @@ namespace Ultimate
         const Node execute(NodeType::execute);
         const Node value(NodeType::value, 0.f);
         const Node op(NodeType::ultimate);
+        const Node next(NodeType::next);
 
         UiNode ui_node;
         ui_node.type                = UiNodeType::ultimate;
         ui_node.ui.ultimate.execute = graph.insert_node(execute);
         ui_node.ui.ultimate.input   = graph.insert_node(value);
         ui_node.id                  = graph.insert_node(op);
+        ui_node.ui.ultimate.next    = graph.insert_node(next);
 
         graph.insert_edge(ui_node.id, ui_node.ui.ultimate.execute);
         graph.insert_edge(ui_node.id, ui_node.ui.ultimate.input);
+        graph.insert_edge(ui_node.ui.ultimate.next, ui_node.id);
 
         nodes.push_back(ui_node);
         return ui_node.id;
@@ -425,6 +428,14 @@ namespace Ultimate
 
         {
             ImNodes::BeginOutputAttribute(node.id);
+            const float label_width = ImGui::CalcTextSize("out").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted("out");
+            ImNodes::EndOutputAttribute();
+        }
+
+        {
+            ImNodes::BeginOutputAttribute(node.ui.ultimate.next);
             const float label_width = ImGui::CalcTextSize(">").x;
             ImGui::Indent(node_width - label_width);
             ImGui::TextUnformatted(">");
@@ -436,7 +447,9 @@ namespace Ultimate
 
     void Erase(Graph<Node>& graph, const UiNode& uiNode)
     {
+        graph.erase_node(uiNode.ui.ultimate.execute);
         graph.erase_node(uiNode.ui.ultimate.input);
+        graph.erase_node(uiNode.ui.ultimate.next);
     }
 }  // namespace Ultimate
 

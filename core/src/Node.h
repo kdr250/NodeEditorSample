@@ -3,6 +3,7 @@
 enum class NodeType
 {
     execute,
+    next,
     add,
     multiply,
     sine,
@@ -30,42 +31,36 @@ enum class PinType
     execute,
 };
 
-static inline PinType GetPinType(NodeType nodeType)
-{
-    switch (nodeType)
-    {
-        case NodeType::add:
-        case NodeType::multiply:
-        case NodeType::sine:
-        case NodeType::time:
-        case NodeType::value:
-            return PinType::value;
-
-        case NodeType::execute:
-        case NodeType::print:
-        case NodeType::ultimate:
-        case NodeType::ultimate2:
-            return PinType::execute;
-
-        default:
-            break;
-    }
-}
-
 struct Node
 {
     NodeType type;
-    PinType pinType;
     float value;
 
-    explicit Node(const NodeType t) : type(t), value(0.f)
-    {
-        pinType = GetPinType(type);
-    }
+    explicit Node(const NodeType t) : type(t), value(0.f) {}
 
-    Node(const NodeType t, const float v) : type(t), value(v)
+    Node(const NodeType t, const float v) : type(t), value(v) {}
+
+    static inline PinType GetPinType(NodeType nodeType)
     {
-        pinType = GetPinType(type);
+        switch (nodeType)
+        {
+            case NodeType::add:
+            case NodeType::multiply:
+            case NodeType::sine:
+            case NodeType::time:
+            case NodeType::value:
+            case NodeType::ultimate:
+                return PinType::value;
+
+            case NodeType::execute:
+            case NodeType::next:
+            case NodeType::print:
+            case NodeType::ultimate2:
+                return PinType::execute;
+
+            default:
+                break;
+        }
     }
 };
 
@@ -104,6 +99,7 @@ struct UiNode
         {
             int execute;
             int input;
+            int next;
         } ultimate;
 
         struct

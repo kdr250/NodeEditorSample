@@ -383,4 +383,33 @@ namespace example
             }
         }
     }
+
+    template<typename NodeType>
+    int count_hierarchy(const Graph<NodeType>& graph, const int start_node, const int end_node)
+    {
+        std::stack<int> stack;
+
+        stack.push(start_node);
+
+        int result = 0;
+
+        while (!stack.empty())
+        {
+            const int current_node = stack.top();
+            stack.pop();
+
+            if (current_node == end_node)
+            {
+                result++;
+                continue;
+            }
+
+            for (const int neighbor : graph.neighbors(current_node))
+            {
+                stack.push(neighbor);
+            }
+        }
+
+        return result;
+    }
 }  // namespace example

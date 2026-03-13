@@ -8,9 +8,12 @@ int UltimateFunction(lua_State* pL)
     const lua_Number num = lua_tonumber(pL, 1);
     lua_pop(pL, lua_gettop(pL));
 
-    std::cout << "C++ Ultimate Function! input : " << num << std::endl;
+    // Set return value to Lua
+    lua_pushnumber(pL, num);
 
-    return 0;
+    std::cout << "C++ Ultimate Function! input: " << num << std::endl;
+
+    return 1;
 }
 
 int UltimateFunction2(lua_State* pL)
