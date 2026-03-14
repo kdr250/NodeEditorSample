@@ -1,16 +1,61 @@
 #include "LuaScriptBuilder.h"
+#include <functional>
+
+namespace LuaScriptBuilderHelper
+{
+    void dfs_traverse(const example::Graph<Node>& graph,
+                      const int start_node,
+                      std::function<void(const int)> visitor)
+    {
+        std::stack<int> stack;
+
+        stack.push(start_node);
+
+        while (!stack.empty())
+        {
+            const int current_node = stack.top();
+            stack.pop();
+
+            Node node = graph.node(current_node);
+            if (node.type == NodeType::execute)
+            {
+                bool isHierarcy = false;
+                for (const int neighbor : graph.neighbors(current_node))
+                {
+                    Node next = graph.node(neighbor);
+                    if (is_hierarchy(graph, (int)node.value, (int)next.value, current_node))
+                    {
+                        isHierarcy = true;
+                        break;
+                    }
+                }
+                if (isHierarcy)
+                {
+                    continue;
+                }
+            }
+
+            visitor(current_node);
+
+            for (const int neighbor : graph.neighbors(current_node))
+            {
+                stack.push(neighbor);
+            }
+        }
+    }
+}  // namespace LuaScriptBuilderHelper
 
 std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, const int root_node)
 {
     std::stringstream result;
 
     std::stack<int> postorder;
-    dfs_traverse(graph,
-                 root_node,
-                 [&postorder](const int node_id) -> void
-                 {
-                     postorder.push(node_id);
-                 });
+    LuaScriptBuilderHelper::dfs_traverse(graph,
+                                         root_node,
+                                         [&postorder](const int node_id) -> void
+                                         {
+                                             postorder.push(node_id);
+                                         });
 
     std::stack<std::string> code_stack;
     unsigned int variable_id = 0;

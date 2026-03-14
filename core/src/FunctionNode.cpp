@@ -244,15 +244,17 @@ namespace Print
 
     int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
     {
-        const Node execute(NodeType::execute);
+        Node execute(NodeType::execute);
         const Node value(NodeType::value, 0.f);
         const Node print(NodeType::print);
 
         UiNode ui_node;
-        ui_node.type             = UiNodeType::print;
+        ui_node.type           = UiNodeType::print;
+        ui_node.ui.print.input = graph.insert_node(value);
+        ui_node.id             = graph.insert_node(print);
+
+        execute.value            = ui_node.id;
         ui_node.ui.print.execute = graph.insert_node(execute);
-        ui_node.ui.print.input   = graph.insert_node(value);
-        ui_node.id               = graph.insert_node(print);
 
         graph.insert_edge(ui_node.id, ui_node.ui.print.execute);
         graph.insert_edge(ui_node.id, ui_node.ui.print.input);
@@ -364,16 +366,20 @@ namespace Ultimate
 
     int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
     {
-        const Node execute(NodeType::execute);
+        Node execute(NodeType::execute);
         const Node value(NodeType::value, 0.f);
         const Node op(NodeType::ultimate);
-        const Node next(NodeType::next);
+        Node next(NodeType::next);
 
         UiNode ui_node;
-        ui_node.type                = UiNodeType::ultimate;
+        ui_node.type = UiNodeType::ultimate;
+
+        ui_node.ui.ultimate.input = graph.insert_node(value);
+        ui_node.id                = graph.insert_node(op);
+
+        execute.value               = ui_node.id;
         ui_node.ui.ultimate.execute = graph.insert_node(execute);
-        ui_node.ui.ultimate.input   = graph.insert_node(value);
-        ui_node.id                  = graph.insert_node(op);
+        next.value                  = ui_node.id;
         ui_node.ui.ultimate.next    = graph.insert_node(next);
 
         graph.insert_edge(ui_node.id, ui_node.ui.ultimate.execute);

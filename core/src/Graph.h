@@ -385,23 +385,28 @@ namespace example
     }
 
     template<typename NodeType>
-    int count_hierarchy(const Graph<NodeType>& graph, const int start_node, const int end_node)
+    bool is_hierarchy(const Graph<NodeType>& graph,
+                      const int child_node,
+                      const int parent_node,
+                      const int exclude_node)
     {
         std::stack<int> stack;
 
-        stack.push(start_node);
-
-        int result = 0;
+        stack.push(child_node);
 
         while (!stack.empty())
         {
             const int current_node = stack.top();
             stack.pop();
 
-            if (current_node == end_node)
+            if (current_node == exclude_node)
             {
-                result++;
                 continue;
+            }
+
+            if (current_node == parent_node)
+            {
+                return true;
             }
 
             for (const int neighbor : graph.neighbors(current_node))
@@ -410,6 +415,6 @@ namespace example
             }
         }
 
-        return result;
+        return false;
     }
 }  // namespace example
