@@ -149,12 +149,21 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
             {
                 std::string condition = code_stack.top();
                 result << "if " << condition << " then" << std::endl;
+                code_stack.push("end");
             }
             break;
 
             default:
                 break;
         }
+    }
+
+    // FIXME
+    if (!code_stack.empty())
+    {
+        std::string code = code_stack.top();
+        code_stack.pop();
+        result << code << std::endl;
     }
 
     return result;
