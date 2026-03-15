@@ -117,6 +117,15 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
             }
             break;
 
+            case NodeType::boolean:
+            {
+                if (graph.num_edges_from_node(id) == 0ull)
+                {
+                    code_stack.push(node.condition ? "true" : "false");
+                }
+            }
+            break;
+
             case NodeType::ultimate:
             {
                 std::string x = code_stack.top();

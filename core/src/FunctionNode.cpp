@@ -571,7 +571,7 @@ namespace If
     int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
     {
         Node execute(NodeType::execute);
-        const Node value(NodeType::value, 0.f);
+        const Node value(NodeType::boolean, false);
         const Node op(NodeType::IF);
         Node next(NodeType::next);
 
@@ -624,7 +624,7 @@ namespace If
             {
                 ImGui::SameLine();
                 ImGui::PushItemWidth(node_width - label_width);
-                ImGui::Checkbox("##hidelabel", (bool*)&graph.node(node.ui.If.input).value);
+                ImGui::Checkbox("##hidelabel", (bool*)&graph.node(node.ui.If.input).condition);
                 ImGui::PopItemWidth();
             }
             ImNodes::EndInputAttribute();

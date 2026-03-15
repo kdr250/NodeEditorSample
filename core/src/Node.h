@@ -9,6 +9,7 @@ enum class NodeType
     sine,
     time,
     value,
+    boolean,
     print,
     ultimate,
     ultimate2,
@@ -32,17 +33,37 @@ enum class UiNodeType
 enum class PinType
 {
     value,
+    boolean,
     execute,
 };
 
 struct Node
 {
     NodeType type;
-    float value;
+
+    union
+    {
+        struct
+        {
+            float value;
+        };
+
+        struct
+        {
+            int id;
+        };
+
+        struct
+        {
+            bool condition;
+        };
+    };
 
     explicit Node(const NodeType t) : type(t), value(0.f) {}
 
     Node(const NodeType t, const float v) : type(t), value(v) {}
+    Node(const NodeType t, const int id) : type(t), id(id) {}
+    Node(const NodeType t, const bool c) : type(t), condition(c) {}
 
     static inline PinType GetPinType(NodeType nodeType)
     {
@@ -56,6 +77,9 @@ struct Node
             case NodeType::ultimate:
             case NodeType::ultimate2:
                 return PinType::value;
+
+            case NodeType::boolean:
+                return PinType::boolean;
 
             case NodeType::execute:
             case NodeType::next:
