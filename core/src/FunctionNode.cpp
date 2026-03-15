@@ -885,6 +885,168 @@ namespace Less
     }
 };  // namespace Less
 
+namespace Loop
+{
+    std::string Name()
+    {
+        return "loop";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        Node execute(NodeType::execute);
+        const Node count(NodeType::integer, 1);
+        const Node op(NodeType::LOOP);
+        Node next(NodeType::next);
+
+        UiNode ui_node;
+        ui_node.type          = UiNodeType::LOOP;
+        ui_node.ui.Loop.count = graph.insert_node(count);
+        ui_node.id            = graph.insert_node(op);
+
+        execute.id              = ui_node.id;
+        ui_node.ui.Loop.execute = graph.insert_node(execute);
+
+        next.id              = ui_node.id;
+        ui_node.ui.Loop.next = graph.insert_node(next);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.Loop.execute);
+        graph.insert_edge(ui_node.id, ui_node.ui.Loop.count);
+        graph.insert_edge(ui_node.ui.Loop.next, ui_node.id);
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.0f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("loop");
+        ImNodes::EndNodeTitleBar();
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.If.execute);
+            const float label_width = ImGui::CalcTextSize(">").x;
+            ImGui::TextUnformatted(">");
+            if (graph.num_edges_from_node(node.ui.If.execute) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.Loop.count);
+            const float label_width = ImGui::CalcTextSize("count").x;
+            ImGui::TextUnformatted("count");
+            if (graph.num_edges_from_node(node.ui.If.input) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::InputInt("##hidelabel", &graph.node(node.ui.Loop.count).integer);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.ui.Loop.next);
+            const float label_width = ImGui::CalcTextSize(">").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted(">");
+            ImNodes::EndOutputAttribute();
+        }
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.Loop.execute);
+        graph.erase_node(uiNode.ui.Loop.count);
+        graph.erase_node(uiNode.ui.Loop.next);
+    }
+}  // namespace Loop
+
+namespace EndLoop
+{
+    std::string Name()
+    {
+        return "endloop";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        Node execute(NodeType::execute);
+        const Node op(NodeType::END_LOOP, 0);
+        Node next(NodeType::next);
+
+        UiNode ui_node;
+        ui_node.type = UiNodeType::END_LOOP;
+        ui_node.id   = graph.insert_node(op);
+
+        execute.id                 = ui_node.id;
+        ui_node.ui.EndLoop.execute = graph.insert_node(execute);
+
+        next.id                 = ui_node.id;
+        ui_node.ui.EndLoop.next = graph.insert_node(next);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.EndLoop.execute);
+        graph.insert_edge(ui_node.ui.EndLoop.next, ui_node.id);
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.0f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("endloop");
+        ImNodes::EndNodeTitleBar();
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.EndLoop.execute);
+            const float label_width = ImGui::CalcTextSize(">").x;
+            ImGui::TextUnformatted(">");
+            if (graph.num_edges_from_node(node.ui.EndLoop.execute) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.ui.EndLoop.next);
+            const float label_width = ImGui::CalcTextSize(">").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted(">");
+            ImNodes::EndOutputAttribute();
+        }
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.EndLoop.execute);
+        graph.erase_node(uiNode.ui.EndLoop.next);
+    }
+}  // namespace EndLoop
+
 std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
 {
     // clang-format off
@@ -900,6 +1062,8 @@ std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
         {UiNodeType::ELSE, {Else::Name(), Else::Insert, Else::Show, Else::Erase}},
         {UiNodeType::END_IF, {EndIf::Name(), EndIf::Insert, EndIf::Show, If::Erase}},
         {UiNodeType::less, {Less::Name(), Less::Insert, Less::Show, Less::Erase}},
+        {UiNodeType::LOOP, {Loop::Name(), Loop::Insert, Loop::Show, Loop::Erase}},
+        {UiNodeType::END_LOOP, {EndLoop::Name(), EndLoop::Insert, EndLoop::Show, EndLoop::Erase}},
     };
     // clang-format on
 }

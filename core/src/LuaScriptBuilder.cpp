@@ -105,6 +105,7 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
                 code_stack.push(varId);
             }
             break;
+
             case NodeType::value:
             {
                 // If the edge does not have an edge connecting to another node, then just use the value
@@ -113,6 +114,18 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
                 if (graph.num_edges_from_node(id) == 0ull)
                 {
                     code_stack.push(std::to_string(node.value));
+                }
+            }
+            break;
+
+            case NodeType::integer:
+            {
+                // If the edge does not have an edge connecting to another node, then just use the value
+                // at this node. It means the node's input pin has not been connected to anything and
+                // the value comes from the node's UI.
+                if (graph.num_edges_from_node(id) == 0ull)
+                {
+                    code_stack.push(std::to_string(node.integer));
                 }
             }
             break;
@@ -182,6 +195,19 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
                 std::string varId = "var" + std::to_string(variable_id++);
                 result << varId << " = " << lhs << " < " << rhs << ";" << std::endl;
                 code_stack.push(varId);
+            }
+            break;
+
+            case NodeType::LOOP:
+            {
+                std::string count = code_stack.top();
+                result << "for i = 1, " << count << " do" << std::endl;
+            }
+            break;
+
+            case NodeType::END_LOOP:
+            {
+                result << "end" << std::endl;
             }
             break;
 

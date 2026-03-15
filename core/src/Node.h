@@ -9,6 +9,7 @@ enum class NodeType
     sine,
     time,
     value,
+    integer,
     boolean,
     print,
     ultimate,
@@ -17,6 +18,8 @@ enum class NodeType
     ELSE,
     END_IF,
     less,
+    LOOP,
+    END_LOOP,
 };
 
 enum class UiNodeType
@@ -32,11 +35,14 @@ enum class UiNodeType
     ELSE,
     END_IF,
     less,
+    LOOP,
+    END_LOOP,
 };
 
 enum class PinType
 {
     value,
+    integer,
     boolean,
     execute,
 };
@@ -55,6 +61,11 @@ struct Node
         struct
         {
             int id;
+        };
+
+        struct
+        {
+            int integer;
         };
 
         struct
@@ -82,6 +93,9 @@ struct Node
             case NodeType::ultimate2:
                 return PinType::value;
 
+            case NodeType::integer:
+                return PinType::integer;
+
             case NodeType::boolean:
             case NodeType::less:
                 return PinType::boolean;
@@ -92,6 +106,8 @@ struct Node
             case NodeType::IF:
             case NodeType::ELSE:
             case NodeType::END_IF:
+            case NodeType::LOOP:
+            case NodeType::END_LOOP:
                 return PinType::execute;
 
             default:
@@ -168,5 +184,18 @@ struct UiNode
         {
             int lhs, rhs;
         } less;
+
+        struct
+        {
+            int execute;
+            int count;
+            int next;
+        } Loop;
+
+        struct
+        {
+            int execute;
+            int next;
+        } EndLoop;
     } ui;
 };
