@@ -50,12 +50,12 @@ struct Node
             case NodeType::time:
             case NodeType::value:
             case NodeType::ultimate:
+            case NodeType::ultimate2:
                 return PinType::value;
 
             case NodeType::execute:
             case NodeType::next:
             case NodeType::print:
-            case NodeType::ultimate2:
                 return PinType::execute;
 
             default:
@@ -106,6 +106,7 @@ struct UiNode
         {
             int execute;
             int input;
+            int next;
         } ultimate2;
     } ui;
 };

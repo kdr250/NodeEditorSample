@@ -24,9 +24,12 @@ int UltimateFunction2(lua_State* pL)
 
     const float result = static_cast<float>(num) * 2;
 
+    // Set return value to Lua
+    lua_pushnumber(pL, result);
+
     std::cout << "C++ Ultimate Function 2! input: " << num << ", x2 = " << result << std::endl;
 
-    return 0;
+    return 1;
 }
 
 std::vector<std::string> CppFunctions::GetFunctionNames()
