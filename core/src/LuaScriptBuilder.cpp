@@ -145,6 +145,13 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
             }
             break;
 
+            case NodeType::IF:
+            {
+                std::string condition = code_stack.top();
+                result << "if " << condition << " then" << std::endl;
+            }
+            break;
+
             default:
                 break;
         }

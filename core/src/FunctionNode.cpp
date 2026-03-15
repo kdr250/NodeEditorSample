@@ -561,6 +561,105 @@ namespace Ultimate2
     }
 }  // namespace Ultimate2
 
+namespace IF
+{
+    std::string Name()
+    {
+        return "if";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        Node execute(NodeType::execute);
+        const Node value(NodeType::value, 0.f);
+        const Node op(NodeType::IF);
+        Node next(NodeType::next);
+
+        UiNode ui_node;
+        ui_node.type        = UiNodeType::IF;
+        ui_node.ui.IF.input = graph.insert_node(value);
+        ui_node.id          = graph.insert_node(op);
+
+        execute.value         = ui_node.id;
+        ui_node.ui.IF.execute = graph.insert_node(execute);
+
+        next.value         = ui_node.id;
+        ui_node.ui.IF.next = graph.insert_node(next);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.IF.execute);
+        graph.insert_edge(ui_node.id, ui_node.ui.IF.input);
+        graph.insert_edge(ui_node.ui.IF.next, ui_node.id);
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.0f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("if");
+        ImNodes::EndNodeTitleBar();
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.IF.execute);
+            const float label_width = ImGui::CalcTextSize(">").x;
+            ImGui::TextUnformatted(">");
+            if (graph.num_edges_from_node(node.ui.IF.execute) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.IF.input);
+            const float label_width = ImGui::CalcTextSize("condition").x;
+            ImGui::TextUnformatted("condition");
+            if (graph.num_edges_from_node(node.ui.IF.input) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::Checkbox("##hidelabel", (bool*)&graph.node(node.ui.IF.input).value);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.ui.IF.next);
+            const float label_width = ImGui::CalcTextSize("true >").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted("true >");
+            ImNodes::EndOutputAttribute();
+        }
+
+        // // TODO: implement false
+        // {
+        //     ImNodes::BeginOutputAttribute(node.ui.ultimate2.next);
+        //     const float label_width = ImGui::CalcTextSize("false").x;
+        //     ImGui::Indent(node_width - label_width);
+        //     ImGui::TextUnformatted("false");
+        //     ImNodes::EndOutputAttribute();
+        // }
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.IF.execute);
+        graph.erase_node(uiNode.ui.IF.input);
+        graph.erase_node(uiNode.ui.IF.next);
+    }
+}  // namespace IF
+
 std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
 {
     // clang-format off
@@ -572,6 +671,7 @@ std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
         {UiNodeType::ultimate, {Ultimate::Name(), Ultimate::Insert, Ultimate::Show, Ultimate::Erase}},
         {UiNodeType::ultimate2, {Ultimate2::Name(), Ultimate2::Insert, Ultimate2::Show, Ultimate2::Erase}},
         {UiNodeType::print, {Print::Name(), Print::Insert, Print::Show, Print::Erase, true}},
+        {UiNodeType::IF, {IF::Name(), IF::Insert, IF::Show, IF::Erase}},
     };
     // clang-format on
 }
