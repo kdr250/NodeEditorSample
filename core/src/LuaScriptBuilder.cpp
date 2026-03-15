@@ -23,7 +23,7 @@ namespace LuaScriptBuilderHelper
                 for (const int neighbor : graph.neighbors(current_node))
                 {
                     Node next = graph.node(neighbor);
-                    if (is_hierarchy(graph, (int)node.value, (int)next.value, current_node))
+                    if (is_hierarchy(graph, node.id, next.id, current_node))
                     {
                         isHierarcy = true;
                         break;

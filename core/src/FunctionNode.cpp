@@ -253,7 +253,7 @@ namespace Print
         ui_node.ui.print.input = graph.insert_node(value);
         ui_node.id             = graph.insert_node(print);
 
-        execute.value            = ui_node.id;
+        execute.id               = ui_node.id;
         ui_node.ui.print.execute = graph.insert_node(execute);
 
         graph.insert_edge(ui_node.id, ui_node.ui.print.execute);
@@ -377,9 +377,9 @@ namespace Ultimate
         ui_node.ui.ultimate.input = graph.insert_node(value);
         ui_node.id                = graph.insert_node(op);
 
-        execute.value               = ui_node.id;
+        execute.id                  = ui_node.id;
         ui_node.ui.ultimate.execute = graph.insert_node(execute);
-        next.value                  = ui_node.id;
+        next.id                     = ui_node.id;
         ui_node.ui.ultimate.next    = graph.insert_node(next);
 
         graph.insert_edge(ui_node.id, ui_node.ui.ultimate.execute);
@@ -478,10 +478,10 @@ namespace Ultimate2
         ui_node.ui.ultimate2.input = graph.insert_node(value);
         ui_node.id                 = graph.insert_node(op);
 
-        execute.value                = ui_node.id;
+        execute.id                   = ui_node.id;
         ui_node.ui.ultimate2.execute = graph.insert_node(execute);
 
-        next.value                = ui_node.id;
+        next.id                   = ui_node.id;
         ui_node.ui.ultimate2.next = graph.insert_node(next);
 
         graph.insert_edge(ui_node.id, ui_node.ui.ultimate2.execute);
@@ -580,10 +580,10 @@ namespace If
         ui_node.ui.If.input = graph.insert_node(value);
         ui_node.id          = graph.insert_node(op);
 
-        execute.value         = ui_node.id;
+        execute.id            = ui_node.id;
         ui_node.ui.If.execute = graph.insert_node(execute);
 
-        next.value         = ui_node.id;
+        next.id            = ui_node.id;
         ui_node.ui.If.next = graph.insert_node(next);
 
         graph.insert_edge(ui_node.id, ui_node.ui.If.execute);
@@ -677,10 +677,10 @@ namespace EndIf
         ui_node.type = UiNodeType::END_IF;
         ui_node.id   = graph.insert_node(op);
 
-        execute.value            = ui_node.id;
+        execute.id               = ui_node.id;
         ui_node.ui.EndIf.execute = graph.insert_node(execute);
 
-        next.value            = ui_node.id;
+        next.id               = ui_node.id;
         ui_node.ui.EndIf.next = graph.insert_node(next);
 
         graph.insert_edge(ui_node.id, ui_node.ui.EndIf.execute);
