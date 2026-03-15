@@ -161,6 +161,12 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
             }
             break;
 
+            case NodeType::ELSE:
+            {
+                result << "else" << std::endl;
+            }
+            break;
+
             case NodeType::END_IF:
             {
                 result << "end" << std::endl;

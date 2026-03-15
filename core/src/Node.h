@@ -14,6 +14,7 @@ enum class NodeType
     ultimate,
     ultimate2,
     IF,
+    ELSE,
     END_IF,
     less,
 };
@@ -28,6 +29,7 @@ enum class UiNodeType
     ultimate,
     ultimate2,
     IF,
+    ELSE,
     END_IF,
     less,
 };
@@ -88,6 +90,7 @@ struct Node
             case NodeType::next:
             case NodeType::print:
             case NodeType::IF:
+            case NodeType::ELSE:
             case NodeType::END_IF:
                 return PinType::execute;
 
@@ -148,6 +151,12 @@ struct UiNode
             int input;
             int next;
         } If;
+
+        struct
+        {
+            int execute;
+            int next;
+        } Else;
 
         struct
         {
