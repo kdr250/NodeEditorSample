@@ -167,6 +167,18 @@ std::stringstream LuaScriptBuilder::Evaluate(const example::Graph<Node>& graph, 
             }
             break;
 
+            case NodeType::less:
+            {
+                std::string rhs = code_stack.top();
+                code_stack.pop();
+                std::string lhs = code_stack.top();
+                code_stack.pop();
+                std::string varId = "var" + std::to_string(variable_id++);
+                result << varId << " = " << lhs << " < " << rhs << ";" << std::endl;
+                code_stack.push(varId);
+            }
+            break;
+
             default:
                 break;
         }

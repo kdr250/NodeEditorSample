@@ -732,6 +732,87 @@ namespace EndIf
     }
 }  // namespace EndIf
 
+namespace Less
+{
+    std::string Name()
+    {
+        return "<";
+    };
+
+    int Insert(Graph<Node>& graph, std::vector<UiNode>& nodes)
+    {
+        const Node value(NodeType::value, 0.0f);
+        const Node op(NodeType::less, false);
+
+        UiNode ui_node;
+        ui_node.type        = UiNodeType::less;
+        ui_node.ui.less.lhs = graph.insert_node(value);
+        ui_node.ui.less.rhs = graph.insert_node(value);
+        ui_node.id          = graph.insert_node(op);
+
+        graph.insert_edge(ui_node.id, ui_node.ui.less.lhs);
+        graph.insert_edge(ui_node.id, ui_node.ui.less.rhs);
+
+        nodes.push_back(ui_node);
+        return ui_node.id;
+    }
+
+    void Show(Graph<Node>& graph, const UiNode& node)
+    {
+        const float node_width = 100.f;
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted("<");
+        ImNodes::EndNodeTitleBar();
+        {
+            ImNodes::BeginInputAttribute(node.ui.less.lhs);
+            const float label_width = ImGui::CalcTextSize("left").x;
+            ImGui::TextUnformatted("left");
+            if (graph.num_edges_from_node(node.ui.less.lhs) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel", &graph.node(node.ui.less.lhs).value, 0.01f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        {
+            ImNodes::BeginInputAttribute(node.ui.less.rhs);
+            const float label_width = ImGui::CalcTextSize("right").x;
+            ImGui::TextUnformatted("right");
+            if (graph.num_edges_from_node(node.ui.less.rhs) == 0ull)
+            {
+                ImGui::SameLine();
+                ImGui::PushItemWidth(node_width - label_width);
+                ImGui::DragFloat("##hidelabel", &graph.node(node.ui.less.rhs).value, 0.01f);
+                ImGui::PopItemWidth();
+            }
+            ImNodes::EndInputAttribute();
+        }
+
+        ImGui::Spacing();
+
+        {
+            ImNodes::BeginOutputAttribute(node.id);
+            const float label_width = ImGui::CalcTextSize("result").x;
+            ImGui::Indent(node_width - label_width);
+            ImGui::TextUnformatted("result");
+            ImNodes::EndOutputAttribute();
+        }
+
+        ImNodes::EndNode();
+    }
+
+    void Erase(Graph<Node>& graph, const UiNode& uiNode)
+    {
+        graph.erase_node(uiNode.ui.less.lhs);
+        graph.erase_node(uiNode.ui.less.rhs);
+    }
+};  // namespace Less
+
 std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
 {
     // clang-format off
@@ -745,6 +826,7 @@ std::unordered_map<UiNodeType, FunctionNode> FunctionNode::Get()
         {UiNodeType::print, {Print::Name(), Print::Insert, Print::Show, Print::Erase, true}},
         {UiNodeType::IF, {If::Name(), If::Insert, If::Show, If::Erase}},
         {UiNodeType::END_IF, {EndIf::Name(), EndIf::Insert, EndIf::Show, If::Erase}},
+        {UiNodeType::less, {Less::Name(), Less::Insert, Less::Show, Less::Erase}},
     };
     // clang-format on
 }

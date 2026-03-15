@@ -15,6 +15,7 @@ enum class NodeType
     ultimate2,
     IF,
     END_IF,
+    less,
 };
 
 enum class UiNodeType
@@ -28,6 +29,7 @@ enum class UiNodeType
     ultimate2,
     IF,
     END_IF,
+    less,
 };
 
 enum class PinType
@@ -79,6 +81,7 @@ struct Node
                 return PinType::value;
 
             case NodeType::boolean:
+            case NodeType::less:
                 return PinType::boolean;
 
             case NodeType::execute:
@@ -151,5 +154,10 @@ struct UiNode
             int execute;
             int next;
         } EndIf;
+
+        struct
+        {
+            int lhs, rhs;
+        } less;
     } ui;
 };

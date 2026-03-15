@@ -195,6 +195,7 @@ void NodeEditor::show()
         // an edge which links a node's operation to its input. We don't
         // want to render node internals with visible links.
         if (graph_.node(edge.from).type != NodeType::value
+            && graph_.node(edge.from).type != NodeType::boolean
             && graph_.node(edge.from).type != NodeType::execute)
             continue;
 
@@ -225,7 +226,8 @@ void NodeEditor::show()
             {
                 // Ensure the edge is always directed from the value to
                 // whatever produces the value
-                if (start_type != NodeType::value && start_type != NodeType::execute)
+                if (start_type != NodeType::value && start_type != NodeType::boolean
+                    && start_type != NodeType::execute)
                 {
                     std::swap(start_attr, end_attr);
                 }
